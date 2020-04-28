@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Version Condition=" '$(BUILD_BUILDNUMBER)' == '' ">1.0.0.0</Version>
+    <Version Condition=" '$(BUILD_BUILDNUMBER)' != '' ">$(BUILD_BUILDNUMBER)</Version>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Li Haobin</Authors>
+    <Description>RC Queues</Description>
+    <Company>ISEM Department, National University of Singapore</Company>
+    <Copyright>Copyright © 2015 O²DES.NET</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>http://www.o2des.net</PackageProjectUrl>
+    <PackageIconUrl>https://o2desstorage.blob.core.windows.net/public/rcqueues.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/li-haobin/O2DES.Net</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>O2DES.Net Discrete-Event Simulation</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="O2DESNet" Version="3.4.9" />
+  </ItemGroup>
+
+</Project>

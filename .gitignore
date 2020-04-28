@@ -1,0 +1,15 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/O2DESNet.RCQueues/bin/Debug/netstandard2.0
+/O2DESNet.RCQueues/obj
+/TestProgram/bin/Debug/netcoreapp3.0
+/TestProgram/obj
+/O2DESNet.RCQueues.UnitTest/bin/Debug/netcoreapp3.0
+/O2DESNet.RCQueues.UnitTest/obj
+/O2DESNet.RCQueues/bin/Debug
+/ConsoleTester/bin/Debug/netcoreapp3.0
+/ConsoleTester/obj
+/O2DESNet.RCQueues.UnitTest/bin/Debug/netcoreapp2.2
