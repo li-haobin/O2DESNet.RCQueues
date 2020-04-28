@@ -1,4 +1,6 @@
-# O²DES.NET Resource Constrained Queues (O2DESNet.RCQueues)
+# O2DESNet.RCQueues
+(O²DES.NET Resource Constrained Queues)
+
 An O²DES.NET library for modeling flexible queueing system with consideration of resource constraints. 
 The NuGet package can be found at https://www.nuget.org/packages/O2DESNet.RCQueues/.
 
