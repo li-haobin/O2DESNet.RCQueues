@@ -4,12 +4,14 @@
 
 ## v3.5.2
 
-- Bug fixed for HourCounter on PendingLock resources
+Bug fixed for HourCounter on PendingLock resources
 
 ## v3.5.1
 
-- Add HourCounters for pending resources caused by both active and passive occupation
-  This is for a more precise statistics when calculating the utilization of resources, when resource cycles, such as shifts, occur.
+```diff
++ Add HourCounters for pending resources caused by both active and passive occupation
+```
+This is for a more precise statistics when calculating the utilization of resources, when resource cycles, such as shifts, occur.
 
 ## v3.4.1
 
@@ -30,6 +32,8 @@
   - Activity_Loads_Passive
 
  - Fixed bug in recall for pending loads upon resource release
+ 
+...
 
 ## v1.0.7
 1. Bug fixed in HourCounter update
