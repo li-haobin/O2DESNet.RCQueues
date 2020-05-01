@@ -534,7 +534,6 @@ namespace O2DESNet.RCQueues
                         Act_HC_Pending_Dict[moveTo.Activity].ObserveChange(-moveTo.Count, ClockTime);
                         foreach (var load in moveTo) Act_Loads_Pending_Dict[moveTo.Activity].Remove(load);
                     }
-
                     Act_HC_Active_Dict[moveTo.Activity].ObserveChange(moveTo.Count, ClockTime);
                     foreach (var load in moveTo) Act_Loads_Active_Dict[moveTo.Activity].Add(load);
                 }
@@ -831,9 +830,9 @@ namespace O2DESNet.RCQueues
                     Res_Act_HC_Passive_Dict[res].Add(act, AddHourCounter());
                     Res_Act_HC_Occupied_Dict[res].Add(act, AddHourCounter());
                 }
-                Act_HC_Pending_Dict.Add(act, AddHourCounter());
-                Act_HC_Active_Dict.Add(act, AddHourCounter());
-                Act_HC_Passive_Dict.Add(act, AddHourCounter());
+                Act_HC_Pending_Dict.Add(act, AddHourCounter(keepHistory: true));
+                Act_HC_Active_Dict.Add(act, AddHourCounter(keepHistory: true));
+                Act_HC_Passive_Dict.Add(act, AddHourCounter(keepHistory: true));
                 Act_Loads_Pending_Dict.Add(act, new HashSet<ILoad>());
                 Act_Loads_Active_Dict.Add(act, new HashSet<ILoad>());
                 Act_Loads_Passive_Dict.Add(act, new HashSet<ILoad>());

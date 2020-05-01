@@ -14,7 +14,7 @@ namespace O2DESNet.RCQueues.UnitTest
             var assets = Batch_Processing_Samples.Sample1();
             var sim = assets.Sandbox();
             sim.Run(TimeSpan.FromDays(10));
-            if (sim.RCQsModel.AllLoads.Count > 7) Assert.Fail("Need to check if the RCQ is stationary.");
+            if (sim.RCQsModel.AllLoads.Count > 9) Assert.Fail("Need to check if the RCQ is stationary.");
             if (sim.RCQsModel.CountLoads_Exited == 0) Assert.Fail();
         }
 
@@ -89,7 +89,7 @@ namespace O2DESNet.RCQueues.UnitTest
                 sim.RCQsModel.Output_Statistics_CSVs(dir);
                 if (!File.Exists(file1)) Assert.Fail();
                 if (!File.Exists(file2)) Assert.Fail();
-                
+
                 /// clear the directory
                 File.Delete(file1);
                 File.Delete(file2);
@@ -117,8 +117,8 @@ namespace O2DESNet.RCQueues.UnitTest
                     sim.Run(TimeSpan.FromHours(2));
                     sim.RCQsModel.Output_Snapshot_CSVs(sim.ClockTime, dir);
                 }
-                
-                foreach(var file in Directory.GetFiles(dir))
+
+                foreach (var file in Directory.GetFiles(dir))
                 {
                     /// clear the directory
                     File.Delete(file);
