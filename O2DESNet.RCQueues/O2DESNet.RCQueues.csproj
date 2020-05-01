@@ -18,7 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="O2DESNet" Version="3.6.4" />
+    <PackageReference Include="O2DESNet" Version="3.6.5" />
   </ItemGroup>
 
 </Project>
