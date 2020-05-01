@@ -52,7 +52,7 @@ namespace O2DESNet.RCQueues.UnitTest
             if (sim.RCQsModel.AllLoads.Count > 29) Assert.Fail("Need to check if the RCQ is stationary.");
             sim.RCQsModel.Output_Statistics_CSVs();
 
-            if (sim.RCQsModel.CountLoads_Exited == 0) Assert.Fail();
+            if (sim.RCQsModel.CountOfLoads_Exited == 0) Assert.Fail();
         }
 
         [Test]
@@ -63,7 +63,7 @@ namespace O2DESNet.RCQueues.UnitTest
             if (sim.RCQsModel.AllLoads.Count > 29) Assert.Fail("Need to check if the RCQ is stationary.");
             sim.RCQsModel.Output_Statistics_CSVs();
 
-            if (sim.RCQsModel.CountLoads_Exited == 0) Assert.Fail();
+            if (sim.RCQsModel.CountOfLoads_Exited == 0) Assert.Fail();
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace O2DESNet.RCQueues.UnitTest
             if (sim.RCQsModel.AllLoads.Count > 2) Assert.Fail("Need to check if the RCQ is stationary.");
             sim.RCQsModel.Output_Statistics_CSVs();
 
-            if (sim.RCQsModel.CountLoads_Exited == 0) Assert.Fail();
+            if (sim.RCQsModel.CountOfLoads_Exited == 0) Assert.Fail();
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace O2DESNet.RCQueues.UnitTest
 
             sim.RCQsModel.Output_Statistics_CSVs();
 
-            if (sim.RCQsModel.CountLoads_Exited == 0) Assert.Fail();
+            if (sim.RCQsModel.CountOfLoads_Exited == 0) Assert.Fail();
         }
     }
 }
