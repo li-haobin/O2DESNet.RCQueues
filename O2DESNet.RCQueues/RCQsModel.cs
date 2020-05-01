@@ -260,7 +260,7 @@ namespace O2DESNet.RCQueues
         private void Upd_HourCounters_LastTime()
         {
             foreach( var hc in HourCounters)
-                if (hc.LastTime != ClockTime) hc.ObserveChange(0, ClockTime);
+                if (hc.LastTime != ClockTime) hc.ObserveChange(0);
         }
 
         /// <summary>
@@ -355,12 +355,12 @@ namespace O2DESNet.RCQueues
                         if (!released.ContainsKey(res)) released.Add(res, 0);
                         released[res] += qtt;
 
-                        Res_HC_Passive_Dict[res].ObserveChange(-qtt, ClockTime);
-                        Res_HC_Occupied_Dict[res].ObserveChange(-qtt, ClockTime);
+                        Res_HC_Passive_Dict[res].ObserveChange(-qtt);
+                        Res_HC_Occupied_Dict[res].ObserveChange(-qtt);
                         if (ActivitiesToTrace.Contains(act))
                         {
-                            Res_Act_HC_Passive_Dict[res][act].ObserveChange(-qtt, ClockTime);
-                            Res_Act_HC_Occupied_Dict[res][act].ObserveChange(-qtt, ClockTime);
+                            Res_Act_HC_Passive_Dict[res][act].ObserveChange(-qtt);
+                            Res_Act_HC_Occupied_Dict[res][act].ObserveChange(-qtt);
                         }
                     }
                     #endregion
@@ -389,8 +389,8 @@ namespace O2DESNet.RCQueues
                 .GroupBy(t => t.Item1).ToDictionary(g => g.Key, g => g.Sum(t => t.Item2));
             
             foreach (var act in Res_Act_HC_Pending_Dict[res].Keys)                
-                Res_Act_HC_Pending_Dict[res][act].ObserveCount(qtts.ContainsKey(act) ? qtts[act] : 0, ClockTime);
-            Res_HC_Pending_Dict[res].ObserveCount(qtts.Values.Sum(), ClockTime);
+                Res_Act_HC_Pending_Dict[res][act].ObserveCount(qtts.ContainsKey(act) ? qtts[act] : 0);
+            Res_HC_Pending_Dict[res].ObserveCount(qtts.Values.Sum());
         }
 
         /// <summary>
@@ -531,10 +531,10 @@ namespace O2DESNet.RCQueues
                 {
                     if (moveTo.Phase == BatchPhase.Pending)
                     {
-                        Act_HC_Pending_Dict[moveTo.Activity].ObserveChange(-moveTo.Count, ClockTime);
+                        Act_HC_Pending_Dict[moveTo.Activity].ObserveChange(-moveTo.Count);
                         foreach (var load in moveTo) Act_Loads_Pending_Dict[moveTo.Activity].Remove(load);
                     }
-                    Act_HC_Active_Dict[moveTo.Activity].ObserveChange(moveTo.Count, ClockTime);
+                    Act_HC_Active_Dict[moveTo.Activity].ObserveChange(moveTo.Count);
                     foreach (var load in moveTo) Act_Loads_Active_Dict[moveTo.Activity].Add(load);
                 }
 
@@ -543,7 +543,7 @@ namespace O2DESNet.RCQueues
                     var curr = Load_Batch_Current_Dict[load];
                     if (curr != null && ActivitiesToTrace.Contains(curr.Activity))
                     {
-                        Act_HC_Passive_Dict[curr.Activity].ObserveChange(-1, ClockTime);
+                        Act_HC_Passive_Dict[curr.Activity].ObserveChange(-1);
                         Act_Loads_Passive_Dict[curr.Activity].Remove(load);
                     }
                 }
@@ -553,12 +553,12 @@ namespace O2DESNet.RCQueues
                     var res = i.Key;
                     var act = moveTo.Activity;
                     var qtt = i.Value;
-                    Res_HC_Active_Dict[res].ObserveChange(qtt, ClockTime);
-                    Res_HC_Occupied_Dict[res].ObserveChange(qtt, ClockTime);
+                    Res_HC_Active_Dict[res].ObserveChange(qtt);
+                    Res_HC_Occupied_Dict[res].ObserveChange(qtt);
                     if (ActivitiesToTrace.Contains(act))
                     {
-                        Res_Act_HC_Active_Dict[res][act].ObserveChange(qtt, ClockTime);
-                        Res_Act_HC_Occupied_Dict[res][act].ObserveChange(qtt, ClockTime);
+                        Res_Act_HC_Active_Dict[res][act].ObserveChange(qtt);
+                        Res_Act_HC_Occupied_Dict[res][act].ObserveChange(qtt);
                     }
                 }
 
@@ -614,7 +614,7 @@ namespace O2DESNet.RCQueues
                     }
                     if (ActivitiesToTrace.Contains(moveTo.Activity))
                     {
-                        Act_HC_Pending_Dict[moveTo.Activity].ObserveChange(moveTo.Count, ClockTime);
+                        Act_HC_Pending_Dict[moveTo.Activity].ObserveChange(moveTo.Count);
                         foreach (var load in moveTo) Act_Loads_Pending_Dict[moveTo.Activity].Add(load);
                     }
                     Upd_HourCounters_LastTime();
@@ -636,8 +636,8 @@ namespace O2DESNet.RCQueues
             /// Statistics                
             if (ActivitiesToTrace.Contains(batch.Activity))
             {
-                Act_HC_Active_Dict[batch.Activity].ObserveChange(-batch.Count, ClockTime);
-                Act_HC_Passive_Dict[batch.Activity].ObserveChange(batch.Count, ClockTime);
+                Act_HC_Active_Dict[batch.Activity].ObserveChange(-batch.Count);
+                Act_HC_Passive_Dict[batch.Activity].ObserveChange(batch.Count);
                 foreach (var load in batch)
                 {
                     Act_Loads_Active_Dict[batch.Activity].Remove(load);
@@ -649,12 +649,12 @@ namespace O2DESNet.RCQueues
                 var res = i.Key;
                 var act = batch.Activity;
                 var qtt = i.Value;
-                Res_HC_Active_Dict[res].ObserveChange(-qtt, ClockTime);                
-                Res_HC_Passive_Dict[res].ObserveChange(qtt, ClockTime);
+                Res_HC_Active_Dict[res].ObserveChange(-qtt);                
+                Res_HC_Passive_Dict[res].ObserveChange(qtt);
                 if (ActivitiesToTrace.Contains(act))
                 {
-                    Res_Act_HC_Active_Dict[res][act].ObserveChange(-qtt, ClockTime);
-                    Res_Act_HC_Passive_Dict[res][act].ObserveChange(qtt, ClockTime);
+                    Res_Act_HC_Active_Dict[res][act].ObserveChange(-qtt);
+                    Res_Act_HC_Passive_Dict[res][act].ObserveChange(qtt);
                 }
                 if (Resource_Quantity_PendingLock[res] > 0) UpdateHourCounter_ResourcePendingLock(res);
             }
@@ -694,7 +694,7 @@ namespace O2DESNet.RCQueues
             Load_Batch_MovingTo_Dict.Remove(load);
             if (ActivitiesToTrace.Contains(curr.Activity))
             {
-                Act_HC_Passive_Dict[curr.Activity].ObserveChange(-1, ClockTime);
+                Act_HC_Passive_Dict[curr.Activity].ObserveChange(-1);
                 Act_Loads_Passive_Dict[curr.Activity].Remove(load);
             }
             DisposeIfEmpty(curr);
@@ -714,7 +714,7 @@ namespace O2DESNet.RCQueues
                 Resource_Quantity_PendingLock_Dict[resource] + quantity,
                 Res_HC_Available_Dict[resource].LastCount);
             Res_HC_DynamicCapacity_Dict[resource].ObserveCount(
-                Math.Max(0, Res_HC_DynamicCapacity_Dict[resource].LastCount - quantity), ClockTime);
+                Math.Max(0, Res_HC_DynamicCapacity_Dict[resource].LastCount - quantity));
             AtmptLock(resource);
         }
 
@@ -725,9 +725,9 @@ namespace O2DESNet.RCQueues
             var removeFromPending = Math.Min(Resource_Quantity_PendingLock_Dict[resource], qtt);
             Resource_Quantity_PendingLock_Dict[resource] -= removeFromPending;
             qtt -= removeFromPending;
-            Res_HC_Available_Dict[resource].ObserveChange(qtt, ClockTime);
+            Res_HC_Available_Dict[resource].ObserveChange(qtt);
             Res_HC_DynamicCapacity_Dict[resource].ObserveCount(
-                Res_HC_DynamicCapacity_Dict[resource].LastCount + quantity, ClockTime);
+                Res_HC_DynamicCapacity_Dict[resource].LastCount + quantity);
             UpdateHourCounter_ResourcePendingLock(resource);
             if (qtt > 0)
             {
@@ -749,7 +749,7 @@ namespace O2DESNet.RCQueues
             var quantity = Math.Min(
                 Res_HC_Available_Dict[resource].LastCount - Res_HC_Occupied_Dict[resource].LastCount,
                 Resource_Quantity_PendingLock_Dict[resource]);
-            Res_HC_Available_Dict[resource].ObserveChange(-quantity, ClockTime);
+            Res_HC_Available_Dict[resource].ObserveChange(-quantity);
             Resource_Quantity_PendingLock_Dict[resource] -= quantity;
             UpdateHourCounter_ResourcePendingLock(resource);
             if (quantity > 0)
@@ -768,8 +768,8 @@ namespace O2DESNet.RCQueues
             /// Remark: the active occupied resource has higher priority to be counted as it is more likely to be released and locked
             var pendingLockPassive = Resource_Quantity_PendingLock_Dict[resource] - pendingLockActive;
 
-            Res_HC_PendingLock_Active_Dict[resource].ObserveCount(pendingLockActive, ClockTime);
-            Res_HC_PendingLock_Passive_Dict[resource].ObserveCount(pendingLockPassive, ClockTime);
+            Res_HC_PendingLock_Active_Dict[resource].ObserveCount(pendingLockActive);
+            Res_HC_PendingLock_Passive_Dict[resource].ObserveCount(pendingLockPassive);
         }
         #endregion
 
@@ -801,13 +801,13 @@ namespace O2DESNet.RCQueues
             Res_HC_Available_Dict = Assets.Resources.ToDictionary(r => r, r =>
             {
                 var hc = AddHourCounter();
-                hc.ObserveCount(r.Capacity, DateTime.MinValue);
+                hc.ObserveCount(r.Capacity);
                 return hc;
             });
             Res_HC_DynamicCapacity_Dict = Assets.Resources.ToDictionary(r => r, r =>
             {
                 var hc = AddHourCounter();
-                hc.ObserveCount(r.Capacity, DateTime.MinValue);
+                hc.ObserveCount(r.Capacity);
                 return hc;
             });
             Res_HC_Occupied_Dict = Assets.Resources.ToDictionary(r => r, r => AddHourCounter());
