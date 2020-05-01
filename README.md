@@ -6,6 +6,10 @@ The NuGet package can be found at https://www.nuget.org/packages/O2DESNet.RCQueu
 
 # Change Log
 
+## Version 3.6
+- Update with O2DESNet v3.6 for enhanced HourCounter
+- Refined the code and follows the naming convention
+
 ## v3.5.2
 
 Bug fixed for HourCounter on PendingLock resources
