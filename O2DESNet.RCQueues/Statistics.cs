@@ -54,7 +54,7 @@ namespace O2DESNet.RCQueues
                     if (rcq.Assets.Activities.Count > 0)
                     {
                         sw.WriteLine("Act.Id,------ by Activities ------");
-                        foreach (var act in rcq.AllActivities)
+                        foreach (var act in rcq.Resource_Activities[res])
                         {
                             sw.Write("{0},", act.Id);
                             sw.Write("{0},", res.Capacity);
