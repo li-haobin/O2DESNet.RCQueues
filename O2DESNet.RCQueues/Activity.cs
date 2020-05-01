@@ -7,7 +7,7 @@ namespace O2DESNet.RCQueues
     public interface IActivity
     {
         string Id { get; }
-        string Description { get; }
+        string Name { get; }
         IReadOnlyList<IRequirement> Requirements { get; }
         /// <summary>
         /// Inclusive minimum and maxsimum of the batch size
@@ -21,7 +21,7 @@ namespace O2DESNet.RCQueues
     public class Activity : IActivity
     {
         public string Id { get; set; }
-        public string Description { get; set; }
+        public string Name { get; set; }
         public IReadOnlyList<IRequirement> Requirements { get; set; }
         public BatchSizeRange BatchSizeRange { get; set; } = new BatchSizeRange();
         public Func<Random, IEnumerable<ILoad>, IAllocation, TimeSpan> Duration { get; set; }

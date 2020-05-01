@@ -41,7 +41,7 @@ namespace O2DESNet.RCQueues.UnitTest
             Log("Arrive");
             var load = new Load();
             var starter = Assets.Activities[0];
-            RCQsModel.RequestEnter(load, starter);
+            RCQsModel.RequestToEnter(load, starter);
         }
         private void Enter(ILoad load)
         {
@@ -54,7 +54,7 @@ namespace O2DESNet.RCQueues.UnitTest
             //Debug.WriteLine("(Event) Fail {0}", Resource);
 
             Log("Fail", resource);
-            RCQsModel.RequestLock(resource, resource.Capacity);
+            RCQsModel.RequestToLock(resource, resource.Capacity);
             Schedule(() => Repair(resource),
                 Exponential.Sample(DefaultRS, Assets.ResourceCycles[resource].MTTR));
         }
@@ -64,7 +64,7 @@ namespace O2DESNet.RCQueues.UnitTest
             //Debug.WriteLine("(Event) Repair {0}", Resource);
 
             Log("Repair", resource);
-            RCQsModel.RequestUnlock(resource, resource.Capacity);
+            RCQsModel.RequestToUnlock(resource, resource.Capacity);
             ScheduleToFail(resource);
         }
         private void ScheduleToFail(IResource resource)
@@ -78,7 +78,7 @@ namespace O2DESNet.RCQueues.UnitTest
             Log("Start", batch);
             var act = (Activity)batch.Activity;
             Schedule(() => Finish(batch),
-                act.Duration(RS[act], batch, RCQsModel.Batch_Allocation[batch]));
+                act.Duration(RS[act], batch, RCQsModel.BatchToAllocation[batch]));
         }
         private void Finish(IBatch Batch)
         {

@@ -18,11 +18,11 @@ namespace O2DESNet.RCQueues.UnitTest
                 sim.Run(1);
                 if (sim.DebugMode) Debug.WriteLine(sim.ToString());
             }
-            if (sim.RCQsModel.AllLoads.Count > 7) Assert.Fail("Need to check if the RCQ is stationary.");
+            if (sim.RCQsModel.AllLoads.Count > 9) Assert.Fail("Need to check if the RCQ is stationary.");
 
             sim.RCQsModel.Output_Statistics_CSVs();
             sim.RCQsModel.Output_Snapshot_CSVs(sim.ClockTime);
-            if (sim.RCQsModel.CountLoads_Exited == 0) Assert.Fail();
+            if (sim.RCQsModel.CountOfLoads_Exited == 0) Assert.Fail();
         }
     }
 }

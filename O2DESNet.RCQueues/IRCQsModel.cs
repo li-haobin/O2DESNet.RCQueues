@@ -32,13 +32,13 @@ namespace O2DESNet.RCQueues
         /// Map load to the batch/activity which it is currently in, either on active or passive status
         /// Map to null if the load is not in any batch/activity, i.e., pending for the first activity.
         /// </summary>
-        IReadOnlyDictionary<ILoad, IBatch> Load_Batch_Current { get; }
+        IReadOnlyDictionary<ILoad, IBatch> LoadToBatch_Current { get; }
         /// <summary>
         /// Map load to the batch/activity which it is moving to, but stuck due to resource or batch size constraint;
         /// Map to null if the load is not moving to any batch/activity, i.e., on active status in the current batch/activity.
         /// </summary>
-        IReadOnlyDictionary<ILoad, IBatch> Load_Batch_MovingTo { get; }
-        IReadOnlyDictionary<IBatch, ReadOnlyAllocation> Batch_Allocation { get; }
+        IReadOnlyDictionary<ILoad, IBatch> LoadToBatch_MovingTo { get; }
+        IReadOnlyDictionary<IBatch, ReadOnlyAllocation> BatchToAllocation { get; }
         #endregion        
 
         #region by Activities
@@ -49,75 +49,75 @@ namespace O2DESNet.RCQueues
         /// <summary>
         /// Map activity to all loads that is relevant to it, i.e., pending, or active/passive processing
         /// </summary>
-        IReadOnlyDictionary<IActivity, IReadOnlyList<ILoad>> Activity_Loads { get; }
+        IReadOnlyDictionary<IActivity, IReadOnlyList<ILoad>> ActivityToLoads { get; }
         /// <summary>
         /// Map activities to the loads that are pending for it due to insufficient resources, and the time of the pending start
         /// </summary>   
-        IReadOnlyDictionary<IActivity, IReadOnlyList<(IBatch Batch, DateTime Time)>> Activity_BatchTimes_Pending { get; }
+        IReadOnlyDictionary<IActivity, IReadOnlyList<(IBatch Batch, DateTime Time)>> ActivityToBatchTimes_Pending { get; }
         /// <summary>
         /// Map activity to the batch that is created but not met the batch size constraint
         /// </summary>
-        IReadOnlyDictionary<IActivity, IReadOnlyList<IBatch>> Activity_Batches_Batching { get; }
+        IReadOnlyDictionary<IActivity, IReadOnlyList<IBatch>> ActivityToBatches_Batching { get; }
         /// <summary>
         /// Map the activity to the list of quantified resource 
         /// This is to be formed and fixed at init function.
         /// </summary>
-        IReadOnlyDictionary<IActivity, IReadOnlyList<IResource>> Activity_Resources { get; }
+        IReadOnlyDictionary<IActivity, IReadOnlyList<IResource>> ActivityToResources { get; }
         #endregion
 
         #region by Resources
         /// <summary>
         /// Map resource to all relevant activities, i.e., those include the resource in their requirement
         /// </summary>
-        IReadOnlyDictionary<IResource, IReadOnlyList<IActivity>> Resource_Activities { get; }
+        IReadOnlyDictionary<IResource, IReadOnlyList<IActivity>> ResourceToActivities { get; }
         /// <summary>
         /// Map resource to its quantity that is occupied
         /// </summary>
-        IReadOnlyDictionary<IResource, double> Resource_Quantity_Occupied { get; }
+        IReadOnlyDictionary<IResource, double> ResourceQuantity_Occupied { get; }
         /// <summary>
         /// Map resource to its quantity that is available to be occupied
         /// </summary>
-        IReadOnlyDictionary<IResource, double> Resource_Quantity_Available { get; }        
+        IReadOnlyDictionary<IResource, double> ResourceQuantity_Available { get; }        
         /// <summary>
         /// Map resource to the quantity that is pending to be locked
         /// </summary>
-        IReadOnlyDictionary<IResource, double> Resource_Quantity_PendingLock { get; }
+        IReadOnlyDictionary<IResource, double> ResourceQuantity_PendingLock { get; }
         /// <summary>
         /// Map resource to its actual dynamic capacity
         /// Note: dynamic capacity - pending to lock = available quantity
         /// </summary>
-        IReadOnlyDictionary<IResource, double> Resource_Quantity_DynamicCapacity { get; }
+        IReadOnlyDictionary<IResource, double> ResourceQuantity_DynamicCapacity { get; }
         #endregion
 
         #region Statistics
-        int CountLoads_Entered { get; }
-        int CountLoads_Processing { get; }
-        int CountLoads_Exited { get; }
+        int CountOfLoads_Entered { get; }
+        int CountOfLoads_Processing { get; }
+        int CountOfLoads_Exited { get; }
         /// <summary>
         /// HourCounters by Activity for number of pending jobs (i.e., batches)
         /// </summary>
-        IReadOnlyDictionary<IActivity, ReadOnlyHourCounter> Activity_HC_Pending { get; }
-        IReadOnlyDictionary<IActivity, ReadOnlyHourCounter> Activity_HC_Active { get; }
-        IReadOnlyDictionary<IActivity, ReadOnlyHourCounter> Activity_HC_Passive { get; }
-        IReadOnlyDictionary<IResource, ReadOnlyHourCounter> Resource_HC_Pending { get; }
-        IReadOnlyDictionary<IResource, ReadOnlyHourCounter> Resource_HC_Active { get; }
-        IReadOnlyDictionary<IResource, ReadOnlyHourCounter> Resource_HC_Passive { get; }
-        IReadOnlyDictionary<IResource, ReadOnlyHourCounter> Resource_HC_Occupied { get; }
-        IReadOnlyDictionary<IResource, ReadOnlyHourCounter> Resource_HC_Available { get; }
-        IReadOnlyDictionary<IResource, ReadOnlyHourCounter> Resource_HC_DynamicCapacity { get; }
-        IReadOnlyDictionary<IResource, ReadOnlyHourCounter> Resource_HC_PendingLock_Active { get; }
-        IReadOnlyDictionary<IResource, ReadOnlyHourCounter> Resource_HC_PendingLock_Passive { get; }
-        IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> Resource_Activity_HC_Pending { get; }
-        IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> Resource_Activity_HC_Active { get; }
-        IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> Resource_Activity_HC_Passive { get; }
-        IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> Resource_Activity_HC_Occupied { get; }
+        IReadOnlyDictionary<IActivity, ReadOnlyHourCounter> ActivityHC_Pending { get; }
+        IReadOnlyDictionary<IActivity, ReadOnlyHourCounter> ActivityHC_Active { get; }
+        IReadOnlyDictionary<IActivity, ReadOnlyHourCounter> ActivityHC_Passive { get; }
+        IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHC_Pending { get; }
+        IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHC_Active { get; }
+        IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHC_Passive { get; }
+        IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHC_Occupied { get; }
+        IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHC_Available { get; }
+        IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHC_DynamicCapacity { get; }
+        IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHC_PendingLock_Active { get; }
+        IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHC_PendingLock_Passive { get; }
+        IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHC_Pending { get; }
+        IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHC_Active { get; }
+        IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHC_Passive { get; }
+        IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHC_Occupied { get; }
         #endregion
 
-        void RequestEnter(ILoad load, IActivity init);
+        void RequestToEnter(ILoad load, IActivity init);
         void Finish(IBatch batch, Dictionary<ILoad, IActivity> nexts);
         void Exit(ILoad load);
-        void RequestLock(IResource resource, double quantity);
-        void RequestUnlock(IResource resource, double quantity);
+        void RequestToLock(IResource resource, double quantity);
+        void RequestToUnlock(IResource resource, double quantity);
 
         event Action<ILoad, IActivity> OnEntered;
         event Action<ILoad> OnReadyToExit;

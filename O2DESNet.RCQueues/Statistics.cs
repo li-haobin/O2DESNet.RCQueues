@@ -21,15 +21,15 @@ namespace O2DESNet.RCQueues
                 foreach (var act in rcq.AllActivities)
                 {
                     sw.Write("{0},", act.Id);
-                    sw.Write("{0},", rcq.Activity_HC_Pending[act].AverageCount);
-                    sw.Write("{0},", rcq.Activity_HC_Active[act].AverageCount);
-                    sw.Write("{0},", rcq.Activity_HC_Passive[act].AverageCount);
-                    sw.Write("{0},", rcq.Activity_HC_Pending[act].AverageDuration.TotalHours);
-                    sw.Write("{0},", rcq.Activity_HC_Active[act].AverageDuration.TotalHours);
-                    sw.Write("{0},", rcq.Activity_HC_Passive[act].AverageDuration.TotalHours);
-                    sw.Write("{0},", rcq.Activity_HC_Active[act].TotalIncrement);
-                    sw.Write("{0},", rcq.Activity_HC_Active[act].TotalIncrement - rcq.Activity_HC_Passive[act].TotalDecrement);
-                    sw.Write("{0},", rcq.Activity_HC_Passive[act].TotalDecrement);
+                    sw.Write("{0},", rcq.ActivityHC_Pending[act].AverageCount);
+                    sw.Write("{0},", rcq.ActivityHC_Active[act].AverageCount);
+                    sw.Write("{0},", rcq.ActivityHC_Passive[act].AverageCount);
+                    sw.Write("{0},", rcq.ActivityHC_Pending[act].AverageDuration.TotalHours);
+                    sw.Write("{0},", rcq.ActivityHC_Active[act].AverageDuration.TotalHours);
+                    sw.Write("{0},", rcq.ActivityHC_Passive[act].AverageDuration.TotalHours);
+                    sw.Write("{0},", rcq.ActivityHC_Active[act].TotalIncrement);
+                    sw.Write("{0},", rcq.ActivityHC_Active[act].TotalIncrement - rcq.ActivityHC_Passive[act].TotalDecrement);
+                    sw.Write("{0},", rcq.ActivityHC_Passive[act].TotalDecrement);
                     sw.WriteLine();
                 }
             }
@@ -44,27 +44,27 @@ namespace O2DESNet.RCQueues
 
                     sw.Write("{0},", res.Id);
                     sw.Write("{0},", res.Capacity);
-                    sw.Write("{0},", rcq.Resource_HC_Available[res].AverageCount);
-                    sw.Write("{0},", rcq.Resource_HC_Pending[res].AverageCount);
-                    sw.Write("{0},", rcq.Resource_HC_Active[res].AverageCount);
-                    sw.Write("{0},", rcq.Resource_HC_Passive[res].AverageCount);
-                    sw.Write("{0},", (rcq.Resource_HC_Active[res].AverageCount + rcq.Resource_HC_Passive[res].AverageCount)
-                        / rcq.Resource_HC_Available[res].AverageCount);
+                    sw.Write("{0},", rcq.ResourceHC_Available[res].AverageCount);
+                    sw.Write("{0},", rcq.ResourceHC_Pending[res].AverageCount);
+                    sw.Write("{0},", rcq.ResourceHC_Active[res].AverageCount);
+                    sw.Write("{0},", rcq.ResourceHC_Passive[res].AverageCount);
+                    sw.Write("{0},", (rcq.ResourceHC_Active[res].AverageCount + rcq.ResourceHC_Passive[res].AverageCount)
+                        / rcq.ResourceHC_Available[res].AverageCount);
                     sw.WriteLine();
                     if (rcq.Assets.Activities.Count > 0)
                     {
                         sw.WriteLine("Act.Id,------ by Activities ------");
-                        foreach (var act in rcq.AllActivities)
+                        foreach (var act in rcq.ResourceToActivities[res])
                         {
                             sw.Write("{0},", act.Id);
                             sw.Write("{0},", res.Capacity);
-                            sw.Write("{0},", rcq.Resource_HC_Available[res].AverageCount);
-                            sw.Write("{0},", rcq.Resource_Activity_HC_Pending[res][act].AverageCount);
-                            sw.Write("{0},", rcq.Resource_Activity_HC_Active[res][act].AverageCount);
-                            sw.Write("{0},", rcq.Resource_Activity_HC_Passive[res][act].AverageCount);
-                            sw.Write("{0},", (rcq.Resource_Activity_HC_Active[res][act].AverageCount 
-                                + rcq.Resource_Activity_HC_Passive[res][act].AverageCount)
-                                / rcq.Resource_HC_Available[res].AverageCount);
+                            sw.Write("{0},", rcq.ResourceHC_Available[res].AverageCount);
+                            sw.Write("{0},", rcq.ResourceActivityHC_Pending[res][act].AverageCount);
+                            sw.Write("{0},", rcq.ResourceActivityHC_Active[res][act].AverageCount);
+                            sw.Write("{0},", rcq.ResourceActivityHC_Passive[res][act].AverageCount);
+                            sw.Write("{0},", (rcq.ResourceActivityHC_Active[res][act].AverageCount 
+                                + rcq.ResourceActivityHC_Passive[res][act].AverageCount)
+                                / rcq.ResourceHC_Available[res].AverageCount);
                             sw.WriteLine();
                         }
                         sw.WriteLine();
@@ -85,9 +85,9 @@ namespace O2DESNet.RCQueues
                 sw.WriteLine("Load,Activity,Resrouce,Quantity,Type");
                 foreach(var load in rcq.AllLoads)
                 {
-                    var pending = rcq.Load_Batch_MovingTo[load] != null; /// MoveTos[load] is set to null if the load is processed in activity
-                    var batch = rcq.Load_Batch_Current[load];
-                    foreach (var i in rcq.Batch_Allocation[batch].Res_AggregatedQuantity)
+                    var pending = rcq.LoadToBatch_MovingTo[load] != null; /// MoveTos[load] is set to null if the load is processed in activity
+                    var batch = rcq.LoadToBatch_Current[load];
+                    foreach (var i in rcq.BatchToAllocation[batch].Res_AggregatedQuantity)
                     {
                         var res = i.Key;
                         var qtt = i.Value;
@@ -95,8 +95,8 @@ namespace O2DESNet.RCQueues
                     }
                     if (pending)
                     {
-                        batch = rcq.Load_Batch_MovingTo[load];
-                        foreach (var res in rcq.Activity_Resources[batch.Activity])
+                        batch = rcq.LoadToBatch_MovingTo[load];
+                        foreach (var res in rcq.ActivityToResources[batch.Activity])
                         {
                             var qtt = batch.Activity.Requirements.Where(req => req.Pool.Contains(res)).Sum(req => req.Quantity);
                             sw.WriteLine("{0},{1},{2},{3},{4}", load, batch.Activity, res, qtt, "pending");
@@ -106,9 +106,9 @@ namespace O2DESNet.RCQueues
 
                 sw.WriteLine();
                 sw.WriteLine(",# of Loads");
-                sw.WriteLine("Arrived,{0}", rcq.CountLoads_Entered);
-                sw.WriteLine("Processing,{0}", rcq.CountLoads_Processing);
-                sw.WriteLine("Processed,{0}", rcq.CountLoads_Exited);
+                sw.WriteLine("Arrived,{0}", rcq.CountOfLoads_Entered);
+                sw.WriteLine("Processing,{0}", rcq.CountOfLoads_Processing);
+                sw.WriteLine("Processed,{0}", rcq.CountOfLoads_Exited);
             }
         }
     }

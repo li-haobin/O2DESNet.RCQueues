@@ -3,6 +3,7 @@
     public interface IResource
     {
         string Id { get; }
+        string Name { get; }
         int Index { get; }
         double Capacity { get; }
     }
@@ -15,11 +16,12 @@
         private static int _count = 0;
         public int Index { get; private set; } = _count++;
         public string Id { get; set; }
+        public string Name { get; set; }
         public string Description { get; set; }
         public double Capacity { get; set; }
         public override string ToString()
         {
-            var str = Id;
+            var str = Name;
             if (str == null || str.Length == 0) str = string.Format("{0}#{1}", GetType().Name, Index);
             return str;
         }
