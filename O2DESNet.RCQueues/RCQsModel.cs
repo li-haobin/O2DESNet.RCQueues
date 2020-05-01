@@ -257,12 +257,6 @@ namespace O2DESNet.RCQueues
 
         #region Methods / Events
         
-        private void Upd_HourCounters_LastTime()
-        {
-            foreach( var hc in HourCounters)
-                if (hc.LastTime != ClockTime) hc.ObserveChange(0);
-        }
-
         /// <summary>
         /// Enquiry for remaining capacity of given resource, for given load and activity
         /// </summary>
@@ -460,8 +454,6 @@ namespace O2DESNet.RCQueues
             {
                 var released = ReleaseResources(new Batch[] { batch });                
                 if (released.Count > 0) RecallForPending(released.Keys);
-                
-                Upd_HourCounters_LastTime();
             }
         }
         public void RequestEnter(ILoad load, IActivity init)
@@ -588,8 +580,6 @@ namespace O2DESNet.RCQueues
                 moveTo.Phase = BatchPhase.Started;
                                         
                 RecallForPending(released.Keys);
-
-                Upd_HourCounters_LastTime();
             }
             #endregion
 
@@ -617,7 +607,6 @@ namespace O2DESNet.RCQueues
                         Act_HC_Pending_Dict[moveTo.Activity].ObserveChange(moveTo.Count);
                         foreach (var load in moveTo) Act_Loads_Pending_Dict[moveTo.Activity].Add(load);
                     }
-                    Upd_HourCounters_LastTime();
                 }
             }
             #endregion
@@ -741,10 +730,7 @@ namespace O2DESNet.RCQueues
         /// Atempt to lock resource for the pending quantity
         /// </summary>
         private double AtmptLock(IResource resource)
-
         {
-            if (resource.Id == "Manpower Putaway") ;
-
             Log("AtmptLock", resource);
             var quantity = Math.Min(
                 Res_HC_Available_Dict[resource].LastCount - Res_HC_Occupied_Dict[resource].LastCount,
