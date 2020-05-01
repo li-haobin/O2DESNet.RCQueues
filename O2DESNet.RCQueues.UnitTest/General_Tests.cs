@@ -15,7 +15,7 @@ namespace O2DESNet.RCQueues.UnitTest
             var sim = assets.Sandbox();
             sim.Run(TimeSpan.FromDays(10));
             if (sim.RCQsModel.AllLoads.Count > 9) Assert.Fail("Need to check if the RCQ is stationary.");
-            if (sim.RCQsModel.CountLoads_Exited == 0) Assert.Fail();
+            if (sim.RCQsModel.CountOfLoads_Exited == 0) Assert.Fail();
         }
 
         [Test]
@@ -32,16 +32,16 @@ namespace O2DESNet.RCQueues.UnitTest
                 sim.Run(TimeSpan.FromDays(1));
                 var stats_activities = sim.RCQsModel.AllActivities.Select(act => new List<double>
                 {
-                    sim.RCQsModel.Activity_HC_Pending[act].AverageCount,
-                    sim.RCQsModel.Activity_HC_Active[act].AverageCount,
-                    sim.RCQsModel.Activity_HC_Passive[act].AverageCount,
-                    sim.RCQsModel.Activity_HC_Pending[act].AverageDuration.TotalHours,
-                    sim.RCQsModel.Activity_HC_Active[act].AverageDuration.TotalHours,
-                    sim.RCQsModel.Activity_HC_Passive[act].AverageDuration.TotalHours,
+                    sim.RCQsModel.ActivityHC_Pending[act].AverageCount,
+                    sim.RCQsModel.ActivityHC_Active[act].AverageCount,
+                    sim.RCQsModel.ActivityHC_Passive[act].AverageCount,
+                    sim.RCQsModel.ActivityHC_Pending[act].AverageDuration.TotalHours,
+                    sim.RCQsModel.ActivityHC_Active[act].AverageDuration.TotalHours,
+                    sim.RCQsModel.ActivityHC_Passive[act].AverageDuration.TotalHours,
                 }).ToList();
                 foreach (var d in stats_activities.SelectMany(l => l))
                     if (double.IsNaN(d) || d < 0) Assert.Fail();
-                if (sim.RCQsModel.CountLoads_Exited == 0) Assert.Fail();
+                if (sim.RCQsModel.CountOfLoads_Exited == 0) Assert.Fail();
             }
         }
 
@@ -59,13 +59,13 @@ namespace O2DESNet.RCQueues.UnitTest
                 sim.Run(TimeSpan.FromDays(1));
                 var stats_resources = sim.RCQsModel.Assets.Resources.Select(res => new List<double>
                 {
-                    sim.RCQsModel.Resource_HC_Pending[res].AverageCount,
-                    sim.RCQsModel.Resource_HC_Active[res].AverageCount,
-                    sim.RCQsModel.Resource_HC_Passive[res].AverageCount,
+                    sim.RCQsModel.ResourceHC_Pending[res].AverageCount,
+                    sim.RCQsModel.ResourceHC_Active[res].AverageCount,
+                    sim.RCQsModel.ResourceHC_Passive[res].AverageCount,
                 }).ToList();
                 foreach (var d in stats_resources.SelectMany(l => l))
                     if (double.IsNaN(d) || d < 0) Assert.Fail();
-                if (sim.RCQsModel.CountLoads_Exited == 0) Assert.Fail();
+                if (sim.RCQsModel.CountOfLoads_Exited == 0) Assert.Fail();
             }
         }
 
@@ -95,7 +95,7 @@ namespace O2DESNet.RCQueues.UnitTest
                 File.Delete(file2);
                 Directory.Delete(dir);
 
-                if (sim.RCQsModel.CountLoads_Exited == 0) Assert.Fail();
+                if (sim.RCQsModel.CountOfLoads_Exited == 0) Assert.Fail();
             }
         }
 
@@ -125,7 +125,7 @@ namespace O2DESNet.RCQueues.UnitTest
                 }
                 Directory.Delete(dir);
 
-                if (sim.RCQsModel.CountLoads_Exited == 0) Assert.Fail();
+                if (sim.RCQsModel.CountOfLoads_Exited == 0) Assert.Fail();
             }
         }
     }

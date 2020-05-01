@@ -22,7 +22,7 @@ namespace O2DESNet.RCQueues.UnitTest
 
             sim.RCQsModel.Output_Statistics_CSVs();
             sim.RCQsModel.Output_Snapshot_CSVs(sim.ClockTime);
-            if (sim.RCQsModel.CountLoads_Exited == 0) Assert.Fail();
+            if (sim.RCQsModel.CountOfLoads_Exited == 0) Assert.Fail();
         }
     }
 }

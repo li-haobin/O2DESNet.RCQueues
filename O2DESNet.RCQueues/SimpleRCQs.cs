@@ -212,7 +212,7 @@ namespace O2DESNet.RCQueues
                 ActivityDict.Add(id, new Activity
                 {
                     Id = id,
-                    Description = description,
+                    Name = description,
                     Duration = (rs, load, alloc) => duration(rs),
                     Requirements = requirements.Select(req => new Requirement
                     {
@@ -250,7 +250,7 @@ namespace O2DESNet.RCQueues
             Log("Arrive");
             var load = new Load();
             var starter = Assets.Activities.First();
-            RCQsModel.RequestEnter((ILoad)load, starter);
+            RCQsModel.RequestToEnter((ILoad)load, starter);
         }
 
         private void Enter(ILoad load)
@@ -263,7 +263,7 @@ namespace O2DESNet.RCQueues
             Log("Start", batch);
             var act = (Activity)batch.Activity;
             Schedule(() => Finish(batch), 
-                act.Duration(RS[act], batch, RCQsModel.Batch_Allocation[batch]));
+                act.Duration(RS[act], batch, RCQsModel.BatchToAllocation[batch]));
         }
 
         private void Finish(IBatch batch)
