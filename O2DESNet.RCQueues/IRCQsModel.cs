@@ -70,6 +70,8 @@ namespace O2DESNet.RCQueues
         /// Map resource to all relevant activities, i.e., those include the resource in their requirement
         /// </summary>
         IReadOnlyDictionary<IResource, IReadOnlyList<IActivity>> ResourceToActivities { get; }
+        IReadOnlyDictionary<IResource, IReadOnlyDictionary<IBatch, double>> ResourceBatchQuantity_Active { get; }
+        IReadOnlyDictionary<IResource, IReadOnlyDictionary<IBatch, double>> ResourceBatchQuantity_Passive { get; }
         /// <summary>
         /// Map resource to its quantity that is occupied
         /// </summary>
