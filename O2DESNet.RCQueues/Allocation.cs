@@ -15,7 +15,7 @@ namespace O2DESNet.RCQueues
         /// <summary>
         /// Map resource to aggregated allocated quantity across all requirement
         /// </summary>
-        IReadOnlyDictionary<IResource, double> Res_AggregatedQuantity { get; }
+        IReadOnlyDictionary<IResource, double> ResourceQuantity_Aggregated { get; }
     }
     public class ReadOnlyAllocation : IAllocation
     {
@@ -23,7 +23,7 @@ namespace O2DESNet.RCQueues
         {
             get { return Allocation.Requirement_ResourceQuantityList; }
         }
-        public IReadOnlyDictionary<IResource, double> Res_AggregatedQuantity { get { return Allocation.Res_AggregatedQuantity; } }
+        public IReadOnlyDictionary<IResource, double> ResourceQuantity_Aggregated { get { return Allocation.ResourceQuantity_Aggregated; } }
 
         private readonly Allocation Allocation;
         internal ReadOnlyAllocation(Allocation allocation) { Allocation = allocation; }
@@ -32,7 +32,7 @@ namespace O2DESNet.RCQueues
     {
         public IReadOnlyDictionary<IRequirement, IReadOnlyList<(IResource, double)>> Requirement_ResourceQuantityList { get { return Rqmt_ResQttList_Dict.AsReadOnly(); } }
         private readonly Dictionary<IRequirement, List<(IResource, double)>> Rqmt_ResQttList_Dict = new Dictionary<IRequirement, List<(IResource, double)>>();
-        public IReadOnlyDictionary<IResource, double> Res_AggregatedQuantity 
+        public IReadOnlyDictionary<IResource, double> ResourceQuantity_Aggregated 
         {
             get
             {

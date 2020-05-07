@@ -87,7 +87,7 @@ namespace O2DESNet.RCQueues
                 {
                     var pending = rcq.LoadToBatch_MovingTo[load] != null; /// MoveTos[load] is set to null if the load is processed in activity
                     var batch = rcq.LoadToBatch_Current[load];
-                    foreach (var i in rcq.BatchToAllocation[batch].Res_AggregatedQuantity)
+                    foreach (var i in rcq.BatchToAllocation[batch].ResourceQuantity_Aggregated)
                     {
                         var res = i.Key;
                         var qtt = i.Value;
