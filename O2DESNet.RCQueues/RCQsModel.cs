@@ -611,7 +611,13 @@ namespace O2DESNet.RCQueues
                 if (moveTo.Phase != BatchPhase.Pending)
                 {
                     moveTo.Phase = BatchPhase.Pending;
-                    _activityToBatchTimes_Pending[moveTo.Activity].Add((moveTo, ClockTime));
+
+                    var clockTime = ClockTime;
+                    if (moveTo.Count(l => _loadToBatch_Current[l] != null && _loadToBatch_Current[l].Activity == moveTo.Activity) > 0)
+                        clockTime = DateTime.MinValue; /// consider the case of immediate re-work having highest priority, to avoid deadlock
+                    _activityToBatchTimes_Pending[moveTo.Activity].Add((moveTo, clockTime));
+                    _activityToBatchTimes_Pending[moveTo.Activity].Sort((t1, t2) => t1.Time.CompareTo(t2.Time));
+
                     foreach (var res in _activityToResources[moveTo.Activity])
                     {
                         UpdHourCounter_Resource_Pending(res);
@@ -742,10 +748,10 @@ namespace O2DESNet.RCQueues
             _resourceHC_DynamicCapacity[resource].ObserveCount(
                 _resourceHC_DynamicCapacity[resource].LastCount + quantity);
             UpdateHourCounter_ResourcePendingLock(resource);
+            RecallForPending(new List<IResource> { resource }); /// changing from passive pending to unlocked shall also trigger starting of new activities
             if (qtt > 0)
             {
-                Log("Unlocked", resource, qtt);
-                RecallForPending(new List<IResource> { resource });                
+                Log("Unlocked", resource, qtt);                               
                 OnUnlocked.Invoke(resource, qtt);
             }
         }
