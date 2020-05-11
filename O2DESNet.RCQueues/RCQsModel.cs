@@ -600,7 +600,12 @@ namespace O2DESNet.RCQueues
                 }
 
                 moveTo.Phase = BatchPhase.Started;
-                                        
+
+                /// check for the next batch in the same activity
+                if (_activityToBatchTimes_Pending[moveTo.Activity].Count > 0) 
+                    Schedule(() => AttemptToStart(_activityToBatchTimes_Pending[moveTo.Activity].First().Batch));
+
+                /// check for released resource
                 RecallForPending(released.Keys);
             }
             #endregion
