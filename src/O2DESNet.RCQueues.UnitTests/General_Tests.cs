@@ -76,12 +76,14 @@ namespace O2DESNet.RCQueues.UnitTests
         [Test]
         public void Generate_Ouput_Statistics()
         {
-            foreach (var assets in new Testbed.Statics[]
+            var testBedStatics = new Testbed.Statics[]
             {
                 General_Test_Samples.Sample1(),
                 new Testbed.Statics(SimpleRCQs_Samples.Sample1()),
                 new Testbed.Statics(SimpleRCQs_Samples.Sample2()),
-            })
+            };
+
+            foreach (var assets in testBedStatics)
             {
                 var sim = assets.Sandbox();
                 sim.Run(TimeSpan.FromDays(1));
@@ -106,12 +108,14 @@ namespace O2DESNet.RCQueues.UnitTests
         [Test]
         public void Generate_Output_Snapshot()
         {
-            foreach (var assets in new Testbed.Statics[]
+            var testBedStatics = new Testbed.Statics[]
             {
                 General_Test_Samples.Sample1(),
                 new Testbed.Statics(SimpleRCQs_Samples.Sample1()),
                 new Testbed.Statics(SimpleRCQs_Samples.Sample2()),
-            })
+            };
+
+            foreach (var assets in testBedStatics)
             {
                 var sim = assets.Sandbox();
                 var dir = Guid.NewGuid().ToString();
@@ -127,6 +131,7 @@ namespace O2DESNet.RCQueues.UnitTests
                     /// clear the directory
                     File.Delete(file);
                 }
+
                 Directory.Delete(dir);
 
                 if (sim.RCQsModel.CountOfLoads_Exited == 0) Assert.Fail();

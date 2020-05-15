@@ -136,7 +136,6 @@ namespace O2DESNet.RCQueues.UnitTests
                         _lookupActivitiesId.Add(ids, id);
 
                     var name = row[Key.Description];
-                    var capacity = Convert.ToDouble(row[Key.Capacity]);
                     var description = row[Key.Description];
                     var duration = Convert.ToDouble(row[Key.Duration_MeanInMinutes]);
                     var cv = Convert.ToDouble(row[Key.Duration_CV]);
@@ -150,7 +149,7 @@ namespace O2DESNet.RCQueues.UnitTests
                             .Where(str => str.Length > 0).Select(str =>
                             {
                                 var splits = str.Split(':');
-                                var id = _lookupActivitiesId[splits[0]];
+                                var id = _lookupResourcesId[splits[0]];
                                 return (id, splits.Length > 1 ? Convert.ToDouble(splits[1]) : 1.0);
                             }).ToList()
 
@@ -159,6 +158,8 @@ namespace O2DESNet.RCQueues.UnitTests
 
                 foreach (var row in data_activities)
                 {
+                    var activityId = row[Key.Id];
+
                     if (row[Key.Succeedings].Length > 0)
                     {
                         foreach (var succStr in row[Key.Succeedings].Split(';'))
@@ -166,13 +167,13 @@ namespace O2DESNet.RCQueues.UnitTests
                             var splits = succStr.Split(':');
                             if (splits.Length > 1)
                             {
-                                var fromId = _lookupActivitiesId[Key.Id];
+                                var fromId = _lookupActivitiesId[activityId];
                                 var toId = _lookupActivitiesId[splits[1]];
                                 simpleRCQs.AddSucceeding(fromId, toId, Convert.ToDouble(splits[0]));
                             }
                             else
                             {
-                                var fromId = _lookupActivitiesId[Key.Id];
+                                var fromId = _lookupActivitiesId[activityId];
                                 var toId = _lookupActivitiesId[splits[0]];
                                 simpleRCQs.AddSucceeding(fromId, toId, 1);
                             }
