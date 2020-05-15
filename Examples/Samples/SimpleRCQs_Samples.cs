@@ -17,30 +17,34 @@ namespace Examples.Samples
 
         public static SimpleRCQs.Statics Sample2()
         {
-            var simpleRCQs = new SimpleRCQs.Statics();
-            simpleRCQs.AddResource("Res1", 10, "Resource #1");
-            simpleRCQs.AddResource("Res2", 3, "Resource #1");
+            var res1 = Guid.NewGuid();
+            var res2 = Guid.NewGuid();
 
             var act1Id = Guid.NewGuid();
             var act2Id = Guid.NewGuid();
             var act3Id = Guid.NewGuid();
 
-            simpleRCQs.AddActivity(act1Id, rs => TimeSpan.FromMinutes(rs.NextDouble() * 5), name: "Activity #1");
-            simpleRCQs.AddActivity(act2Id, rs => TimeSpan.FromMinutes(rs.NextDouble() * 4),
-                new List<(string, double)>
+            var simpleRCQs = new SimpleRCQs.Statics();
+            simpleRCQs.AddResource(res1, "Res1", 10, "Resource #1");
+            simpleRCQs.AddResource(res2, "Res2", 3, "Resource #1");
+
+            simpleRCQs.AddActivity(act1Id, "Activity #1", rs => TimeSpan.FromMinutes(rs.NextDouble() * 5), null, null);
+            simpleRCQs.AddActivity(act2Id, "Activity #2", rs => TimeSpan.FromMinutes(rs.NextDouble() * 4),
+                new List<(Guid, double)>
                 {
-                    ("Res1", 6),
-                    ("Res2", 2),
-                });
-            simpleRCQs.AddActivity(act3Id, rs => TimeSpan.FromMinutes(rs.NextDouble() * 4),
-                new List<(string, double)>
+                    (res1, 6),
+                    (res2, 2),
+                }, null);
+            simpleRCQs.AddActivity(act3Id, "Activity #3", rs => TimeSpan.FromMinutes(rs.NextDouble() * 4),
+                new List<(Guid, double)>
                 {
-                    ("Res1", 4),
-                    ("Res2", 1),
-                });
+                    (res1, 4),
+                    (res2, 1),
+                }, null);
             simpleRCQs.AddSucceeding(act1Id, act2Id, 1);
             simpleRCQs.AddSucceeding(act1Id, act3Id, 1);
             simpleRCQs.Generator.MeanHourlyRate = 10;
+
             return simpleRCQs;
         }
     }

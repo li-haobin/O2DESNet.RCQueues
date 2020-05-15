@@ -1,0 +1,25 @@
+Id,Description,Mean of Duration (min.),CV of Duration,Batch Size (Min),Batch Size (Max),Requirements,Succeedings
+R,Registration,5,1,,,,T
+T,Triage,10,1,,,,1:CC_W;1:AC_W;IC_W
+CC_W,Waiting for consultation (CC),0,1,,,,CC_C
+CC_C,Consultation (CC),30,1,1,10,Docs_CC,CC_CL
+CC_CL,Patient need laboratory investigation? (CC),0,1,,,,CC_L;AC_CO
+CC_L,Laboratory investigation (CC),10,1,,,,CC_R
+CC_R,Waiting for results (CC),10,1,,,,CC_F
+CC_F,Follow-up consultation (CC),10,1,1,3,,CC_CL
+AC_W,Waiting for consultation (AC),0,1,,,,AC_C
+AC_C,Consultation (AC),10,1,,,Docs_AC:1,AC_L
+AC_L,Laboratory investigation (AC),10,1,,,,AC_R
+AC_R,Waiting for results (AC),10,1,,,,AC_F
+AC_F,Follow-up consultation (AC),10,1,,,,AC_CO
+AC_CO,Patient need to be observed? (CC & AC),0,1,,,,AC_O;AC_T
+AC_O,Observation for CC and AC,30,1,,,Beds_CC_AC,AC_CO
+AC_T,Does patient need to transfer to hospital? (CC & AC),0,1,,,,1:A;1:P
+P,Pharmacy and payment,10,1,,,,D
+IC_W,Waiting for consultation (IC),0,1,,,,IC_C
+IC_C,Consultation (IC),15,1,,,Docs_IC,IC_CO
+IC_CO,Patient need to be observed? (IC),0,1,,,,IC_O;1:IC_T
+IC_O,Observation for IC,60,0.3,,,Beds_IC,IC_CO
+IC_T,Does patient need to transfer to hospital? (IC),0,1,,,,A;P
+A,Admission into hospital,10,1,,,,
+D,Patient depature,5,1,,,,

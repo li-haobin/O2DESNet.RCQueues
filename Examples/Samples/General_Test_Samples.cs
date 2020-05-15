@@ -1,5 +1,10 @@
-﻿using O2DESNet.Distributions;
+﻿using Examples.Testbeds;
+
+using O2DESNet.Distributions;
+using O2DESNet.RCQueues;
+using O2DESNet.RCQueues.Interfaces;
 using O2DESNet.Standard;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,106 +15,98 @@ namespace Examples.Samples
     {
         public static Testbed.Statics Sample1()
         {
-            var resources = Enumerable.Range(0, 10).Select(id => (IResource)new Resource { Id = id.ToString(), Capacity = 1 }).ToList();
+            var resources = Enumerable.Range(0, 10)
+                .Select(id => (IResource)new Resource(Guid.NewGuid(), id.ToString()) { Capacity = 1 }).ToList();
+
             HashSet<IResource> GetPool(Func<IResource, bool> condition)
             {
                 return new HashSet<IResource>(resources.Where(condition));
             }
             var activities = new List<Activity>
             {
-                new Activity
+                new Activity("0 - Starter")
                 {
-                    Id = "0 - Starter",
                     Requirements = new List<Requirement>(),
                     Duration = (rs, load, alloc) => Exponential.Sample(rs, TimeSpan.FromMinutes(10)),
                 },
                 // flow 1
-                new Activity
+                new Activity("1")
                 {
-                    Id = "1",
                     Requirements = new List<Requirement>
                     {
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > 5), Quantity = 2 },
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) < 3), Quantity = 1 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > 5), Quantity = 2 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) < 3), Quantity = 1 },
                     },
                     Duration = (rs, load, alloc) => Exponential.Sample(rs, TimeSpan.FromMinutes(5)),
                 },
-                new Activity
+                new Activity("2 - Buffer")
                 {
-                    Id = "2 - Buffer",
                     Requirements = new List<Requirement>(),
                     Duration = (rs, load, alloc) => TimeSpan.FromSeconds(0),
                 },
-                new Activity
+                new Activity("3")
                 {
-                    Id = "3",
                     Requirements = new List<Requirement>
                     {
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > 7), Quantity = 1 },
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > 2 && int.Parse(res.Id) < 5), Quantity = 1 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > 7), Quantity = 1 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > 2 && int.Parse(res.Name) < 5), Quantity = 1 },
                     },
                     Duration = (rs, load, alloc) => Exponential.Sample(rs, TimeSpan.FromMinutes(5)),
                 },
-                new Activity
+                new Activity("4 - Buffer")
                 {
-                    Id = "4 - Buffer",
                     Requirements = new List<Requirement>(),
                     Duration = (rs, load, alloc) => TimeSpan.FromSeconds(0),
                 },
-                new Activity
+                new Activity("5")
                 {
-                    Id = "5",
                     Requirements = new List<Requirement>
                     {
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > 7 && int.Parse(res.Id) < 10), Quantity = 1 },
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > 2 && int.Parse(res.Id) < 5), Quantity = 1 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > 7 && int.Parse(res.Name) < 10), Quantity = 1 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > 2 && int.Parse(res.Name) < 5), Quantity = 1 },
                     },
                     Duration = (rs, load, alloc) => Exponential.Sample(rs, TimeSpan.FromMinutes(5)),
                 },
                 /// flow 2
-                new Activity
+                new Activity("6")
                 {
-                    Id = "6",
                     Requirements = new List<Requirement>
                     {
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > 6 && int.Parse(res.Id) < 8), Quantity = 0.3 },
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > -1 && int.Parse(res.Id) < 4), Quantity = 1 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > 6 && int.Parse(res.Name) < 8), Quantity = 0.3 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > -1 && int.Parse(res.Name) < 4), Quantity = 1 },
                     },
                     Duration = (rs, load, alloc) => Exponential.Sample(rs, TimeSpan.FromMinutes(5)),
                 },
-                new Activity
+                new Activity("7 - Buffer")
                 {
-                    Id = "7 - Buffer",
                     Requirements = new List<Requirement>(),
                     Duration = (rs, load, alloc) => TimeSpan.FromSeconds(0),
                 },
-                new Activity
+                new Activity("8")
                 {
-                    Id = "8",
                     Requirements = new List<Requirement>
                     {
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > 3 && int.Parse(res.Id) < 11), Quantity = 0.2 },
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > 1 && int.Parse(res.Id) < 6), Quantity = 1 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > 3 && int.Parse(res.Name) < 11), Quantity = 0.2 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > 1 && int.Parse(res.Name) < 6), Quantity = 1 },
                     },
                     Duration = (rs, load, alloc) => Exponential.Sample(rs, TimeSpan.FromMinutes(5)),
                 },
-                new Activity
+                new Activity("9 - Buffer")
                 {
-                    Id = "9 - Buffer",
                     Requirements = new List<Requirement>(),
                     Duration = (rs, load, alloc) => TimeSpan.FromSeconds(0),
                 },
-                new Activity
+                new Activity("10")
                 {
-                    Id = "10",
                     Requirements = new List<Requirement>
                     {
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > -1 && int.Parse(res.Id) < 3), Quantity = 0.2 },
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > 6 && int.Parse(res.Id) < 11), Quantity = 1 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > -1 && int.Parse(res.Name) < 3), Quantity = 0.2 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > 6 && int.Parse(res.Name) < 11), Quantity = 1 },
                     },
                     Duration = (rs, load, alloc) => Exponential.Sample(rs, TimeSpan.FromMinutes(5)),
                 },
             };
+
             activities[0].Succeedings = (rs, o) => rs.NextDouble() > 0.3 ? activities[1] : activities[6];
             activities[1].Succeedings = (rs, o) => activities[2];
             activities[2].Succeedings = (rs, o) => activities[3];

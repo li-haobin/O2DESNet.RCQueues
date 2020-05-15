@@ -34,8 +34,8 @@ namespace Examples.Samples
                 {
                     Requirements = new List<Requirement>
                     {
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > 5), Quantity = 2 },
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) < 3), Quantity = 1 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > 5), Quantity = 2 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) < 3), Quantity = 1 },
                     },
                     Duration = (rs, load, alloc) => Exponential.Sample(rs, TimeSpan.FromMinutes(5)),
                     BatchSizeRange = new BatchSizeRange(1, 3),
@@ -49,8 +49,8 @@ namespace Examples.Samples
                 {
                     Requirements = new List<Requirement>
                     {
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > 7), Quantity = 1 },
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > 2 && int.Parse(res.Id) < 5), Quantity = 1 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > 7), Quantity = 1 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > 2 && int.Parse(res.Name) < 5), Quantity = 1 },
                     },
                     Duration = (rs, load, alloc) => Exponential.Sample(rs, TimeSpan.FromMinutes(5)),
                     BatchSizeRange = new BatchSizeRange(2, 3),
@@ -64,8 +64,8 @@ namespace Examples.Samples
                 {
                     Requirements = new List<Requirement>
                     {
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > 7 && int.Parse(res.Id) < 10), Quantity = 1 },
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > 2 && int.Parse(res.Id) < 5), Quantity = 1 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > 7 && int.Parse(res.Name) < 10), Quantity = 1 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > 2 && int.Parse(res.Name) < 5), Quantity = 1 },
                     },
                     Duration = (rs, load, alloc) => Exponential.Sample(rs, TimeSpan.FromMinutes(5)),
                     BatchSizeRange = new BatchSizeRange(1, 1),
@@ -75,8 +75,8 @@ namespace Examples.Samples
                 {
                     Requirements = new List<Requirement>
                     {
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > 6 && int.Parse(res.Id) < 8), Quantity = 0.3 },
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > -1 && int.Parse(res.Id) < 4), Quantity = 1 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > 6 && int.Parse(res.Name) < 8), Quantity = 0.3 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > -1 && int.Parse(res.Name) < 4), Quantity = 1 },
                     },
                     Duration = (rs, load, alloc) => Exponential.Sample(rs, TimeSpan.FromMinutes(5)),
                 },
@@ -89,8 +89,8 @@ namespace Examples.Samples
                 {
                     Requirements = new List<Requirement>
                     {
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > 3 && int.Parse(res.Id) < 11), Quantity = 0.2 },
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > 1 && int.Parse(res.Id) < 6), Quantity = 1 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > 3 && int.Parse(res.Name) < 11), Quantity = 0.2 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > 1 && int.Parse(res.Name) < 6), Quantity = 1 },
                     },
                     Duration = (rs, load, alloc) => Exponential.Sample(rs, TimeSpan.FromMinutes(5)),
                     BatchSizeRange = new BatchSizeRange(3, 3),
@@ -104,13 +104,14 @@ namespace Examples.Samples
                 {
                     Requirements = new List<Requirement>
                     {
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > -1 && int.Parse(res.Id) < 3), Quantity = 0.2 },
-                        new Requirement{ Pool = GetPool(res => int.Parse(res.Id) > 6 && int.Parse(res.Id) < 11), Quantity = 1 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > -1 && int.Parse(res.Name) < 3), Quantity = 0.2 },
+                        new Requirement{ Pool = GetPool(res => int.Parse(res.Name) > 6 && int.Parse(res.Name) < 11), Quantity = 1 },
                     },
                     Duration = (rs, load, alloc) => Exponential.Sample(rs, TimeSpan.FromMinutes(5)),
                     BatchSizeRange = new BatchSizeRange(2, 3),
                 },
             };
+
             activities[0].Succeedings = (rs, o) => rs.NextDouble() > 0.3 ? activities[1] : activities[6];
             activities[1].Succeedings = (rs, o) => activities[2];
             activities[2].Succeedings = (rs, o) => activities[3];
