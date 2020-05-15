@@ -28,9 +28,10 @@ namespace O2DESNet.RCQueues.UnitTests
                 Resources = new List<Resource>();
                 Activities = new List<Activity>();
             }
-            public SimpleRCQs Sandbox(int seed = 0) { return new SimpleRCQs(this, seed); }
 
-            public struct Key
+            public SimpleRCQs Sandbox(int seed = 0) => new SimpleRCQs(this, seed);
+
+            public class Key
             {
                 public const string Id = "Id";
                 public const string Description = "Description";
@@ -38,7 +39,7 @@ namespace O2DESNet.RCQueues.UnitTests
                 public const string Duration_MeanInMinutes = "Mean of Duration (min.)";
                 public const string Duration_CV = "CV of Duration";
                 public const string Requirements = "Requirements";
-                public const string Succeedings = "Succeedings";
+                public const string Succeedings = "Succeeding";
                 public const string Resources = "Resources";
                 public const string Activities = "Activities";
                 public const string BatchSize_Min = "Batch Size (Min)";
@@ -88,6 +89,9 @@ namespace O2DESNet.RCQueues.UnitTests
             public static Statics ReadFromCSVs(string dir)
             {
                 var simpleRCQs = new Statics();
+
+                _lookupResourcesId.Clear();
+                _lookupActivitiesId.Clear();
 
                 #region Read Resources
                 foreach (var row in ReadDataDictFromCSV($@"{dir}\{Key.Resources}.csv"))
@@ -146,12 +150,14 @@ namespace O2DESNet.RCQueues.UnitTests
                         duration: rs => TimeSpan.FromMinutes(Gamma.Sample(rs, duration, cv)),
                         batchSizeRange: batchSizeRange,
                         requirements: row[Key.Requirements].Split(';')
-                            .Where(str => str.Length > 0).Select(str =>
+                            .Where(str => !string.IsNullOrEmpty(str))
+                            .Select(str =>
                             {
                                 var splits = str.Split(':');
                                 var id = _lookupResourcesId[splits[0]];
                                 return (id, splits.Length > 1 ? Convert.ToDouble(splits[1]) : 1.0);
-                            }).ToList()
+                            })
+                            .ToList()
 
                         );
                 }
@@ -183,7 +189,7 @@ namespace O2DESNet.RCQueues.UnitTests
                 #endregion
 
                 #region Read Arrivals
-                foreach (var r in File.ReadAllLines(string.Format("{0}\\{1}.csv", dir, Key.Arrivals)))
+                foreach (var r in File.ReadAllLines($@"{dir}\{Key.Arrivals}.csv"))
                 {
                     var line = r.Split(',').Where(s => s != null && s.Length > 0).ToList();
                     switch (line[0])
@@ -264,16 +270,15 @@ namespace O2DESNet.RCQueues.UnitTests
                     }).ToList()
                 };
 
+                if (batchSizeRange != null)
+                    activity.BatchSizeRange = batchSizeRange;
+
                 activity.Succeedings = (rs, load) => SucceedingDict[activity].Count > 0 ?
                         SucceedingDict[activity][Empirical.Sample(rs, SucceedingDict[activity].Select(t => t.Quantity))].Activity : null;
 
                 ActivityDict.Add(id, activity);
-
-                if (batchSizeRange != null) ActivityDict[id].BatchSizeRange = batchSizeRange;
-
-                Activities.Add(ActivityDict[id]);
-
-                SucceedingDict.Add(ActivityDict[id], new List<ActivityQuantity>());
+                Activities.Add(activity);
+                SucceedingDict.Add(activity, new List<ActivityQuantity>());
             }
 
             /// <summary>
