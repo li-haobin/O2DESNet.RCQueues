@@ -1,14 +1,11 @@
-﻿using O2DESNet.Standard;
+﻿using O2DESNet.RCQueues.Interfaces;
+using O2DESNet.Standard;
+
 using System;
 using System.Collections.Generic;
 
-namespace O2DESNet.RCQueues
+namespace O2DESNet.RCQueues.Interfaces
 {
-    public interface IRCQsModelStatics : IAssets
-    {
-        IReadOnlyList<IResource> Resources { get; }
-        IReadOnlyList<IActivity> Activities { get; }        
-    }
 
     public interface IRCQsModel : ISandbox
     {

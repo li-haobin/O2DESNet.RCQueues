@@ -1,4 +1,6 @@
 ﻿using O2DESNet;
+using O2DESNet.RCQueues.Common;
+using O2DESNet.RCQueues.Interfaces;
 using O2DESNet.Standard;
 using System;
 using System.Collections.Generic;
@@ -53,7 +55,7 @@ namespace O2DESNet.RCQueues
         private readonly Dictionary<IBatch, Allocation> _batchToAllocation = new Dictionary<IBatch, Allocation>();
 
         /// <summary>
-        /// The stage indices which is strictly increasing for each successful move, 
+        /// The stage indices's which is strictly increasing for each successful move, 
         /// for all loads in the system.
         /// </summary>
         private readonly Dictionary<ILoad, int> StageIndices = new Dictionary<ILoad, int>();
@@ -867,7 +869,8 @@ namespace O2DESNet.RCQueues
             string str = "[Loads]\n";
             foreach (var load in _allLoads.OrderBy(l => l.Index))
             {
-                str += string.Format("Id: {0}\tAct_Id: {1}\t", load, _loadToBatch_Current[load] == null ? "null" : _loadToBatch_Current[load].Activity.Id);
+                str += string.Format("Id: {0}\tAct_Id: {1}\t", load,
+                    _loadToBatch_Current[load] == null ? Guid.Empty : _loadToBatch_Current[load].Activity.Id);
                 if (_loadToBatch_Current[load] != null && _batchToAllocation.ContainsKey(_loadToBatch_Current[load]))
                     foreach (var (res, qtt) in _batchToAllocation[_loadToBatch_Current[load]].Requirement_ResourceQuantityList.SelectMany(i => i.Value))
                         str += string.Format("Res#{0}({1}) ", res.Id, qtt);

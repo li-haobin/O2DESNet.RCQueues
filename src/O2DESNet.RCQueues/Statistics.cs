@@ -20,7 +20,7 @@ namespace O2DESNet.RCQueues
                 sw.WriteLine("Ttl.# Arrived,Ttl.# Processing,Ttl.# Processed,");
                 foreach (var act in rcq.AllActivities)
                 {
-                    sw.Write("{0},", act.Id);
+                    sw.Write("{0},", act.Name);
                     sw.Write("{0},", rcq.ActivityHC_Pending[act].AverageCount);
                     sw.Write("{0},", rcq.ActivityHC_Active[act].AverageCount);
                     sw.Write("{0},", rcq.ActivityHC_Passive[act].AverageCount);
@@ -42,7 +42,7 @@ namespace O2DESNet.RCQueues
                 {
                     if (rcq.Assets.Activities.Count > 0) sw.WriteLine(head);
 
-                    sw.Write("{0},", res.Id);
+                    sw.Write("{0},", res.Name);
                     sw.Write("{0},", res.Capacity);
                     sw.Write("{0},", rcq.ResourceHC_Available[res].AverageCount);
                     sw.Write("{0},", rcq.ResourceHC_Pending[res].AverageCount);
@@ -82,7 +82,7 @@ namespace O2DESNet.RCQueues
             var str_clockTime = clockTime.ToString("yyyy-MM-dd-HH-mm-ss");
             using (var sw = new StreamWriter(string.Format("{0}\\Snapshot_{1}.csv", dir, str_clockTime)))
             {
-                sw.WriteLine("Load,Activity,Resrouce,Quantity,Type");
+                sw.WriteLine("Load,Activity,Resource,Quantity,Type");
                 foreach(var load in rcq.AllLoads)
                 {
                     var pending = rcq.LoadToBatch_MovingTo[load] != null; /// MoveTos[load] is set to null if the load is processed in activity

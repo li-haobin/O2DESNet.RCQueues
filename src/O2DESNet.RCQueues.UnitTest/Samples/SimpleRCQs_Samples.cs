@@ -19,21 +19,26 @@ namespace O2DESNet.RCQueues.UnitTest
             var simpleRCQs = new SimpleRCQs.Statics();
             simpleRCQs.AddResource("Res1", 10, "Resource #1");
             simpleRCQs.AddResource("Res2", 3, "Resource #1");
-            simpleRCQs.AddActivity("Act1", rs => TimeSpan.FromMinutes(rs.NextDouble() * 5), description: "Activity #1");
-            simpleRCQs.AddActivity("Act2", rs => TimeSpan.FromMinutes(rs.NextDouble() * 4),
+
+            var act1Id = Guid.NewGuid();
+            var act2Id = Guid.NewGuid();
+            var act3Id = Guid.NewGuid();
+
+            simpleRCQs.AddActivity(act1Id, rs => TimeSpan.FromMinutes(rs.NextDouble() * 5), name: "Activity #1");
+            simpleRCQs.AddActivity(act2Id, rs => TimeSpan.FromMinutes(rs.NextDouble() * 4),
                 new List<(string, double)>
                 {
                     ("Res1", 6),
                     ("Res2", 2),
                 });
-            simpleRCQs.AddActivity("Act3", rs => TimeSpan.FromMinutes(rs.NextDouble() * 4),
+            simpleRCQs.AddActivity(act3Id, rs => TimeSpan.FromMinutes(rs.NextDouble() * 4),
                 new List<(string, double)>
                 {
                     ("Res1", 4),
                     ("Res2", 1),
                 });
-            simpleRCQs.AddSucceeding("Act1", "Act2", 1);
-            simpleRCQs.AddSucceeding("Act1", "Act3", 1);
+            simpleRCQs.AddSucceeding(act1Id, act2Id, 1);
+            simpleRCQs.AddSucceeding(act1Id, act3Id, 1);
             simpleRCQs.Generator.MeanHourlyRate = 10;
             return simpleRCQs;
         }

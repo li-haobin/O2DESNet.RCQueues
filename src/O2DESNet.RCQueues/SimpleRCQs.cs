@@ -1,4 +1,5 @@
 ﻿using O2DESNet.Distributions;
+using O2DESNet.RCQueues.Interfaces;
 using O2DESNet.Standard;
 using System;
 using System.Collections.Generic;
@@ -123,7 +124,7 @@ namespace O2DESNet.RCQueues
                             var splits = str.Split(':');
                             return (splits[0], splits.Length > 1 ? Convert.ToDouble(splits[1]) : 1.0);
                         }).ToList(),
-                        description: r[Key.Description]
+                        name: r[Key.Description]
                         );
                 }
                 foreach (var r in data_activities)
@@ -183,8 +184,8 @@ namespace O2DESNet.RCQueues
                 return Enumerable.Range(1, rows.Count - 1).Select(i => Enumerable.Range(0, nCols).ToDictionary(j => rows[0][j], j => rows[i][j])).ToList();
             }
 
-            private readonly Dictionary<string, Resource> ResourceDict = new Dictionary<string, Resource>();
-            private readonly Dictionary<string, Activity> ActivityDict = new Dictionary<string, Activity>();
+            private readonly Dictionary<Guid, Resource> ResourceDict = new Dictionary<Guid, Resource>();
+            private readonly Dictionary<Guid, Activity> ActivityDict = new Dictionary<Guid, Activity>();
             private readonly Dictionary<Activity, List<Tuple<Activity, double>>> SucceedingDict
                 = new Dictionary<Activity, List<Tuple<Activity, double>>>();
 
@@ -194,25 +195,23 @@ namespace O2DESNet.RCQueues
             /// <param name="id">Id of the resource</param>
             /// <param name="capacity">Capacity of the resource</param>
             /// <param name="description">Description of the resource</param>
-            public void AddResource(string id, double capacity, string description = null)
+            public void AddResource(Guid id, double capacity, string name)
             {
-                ResourceDict.Add(id, new Resource { Id = id, Capacity = capacity, Description = description });
+                ResourceDict.Add(id, new Resource(id, name) { Capacity = capacity});
                 Resources.Add(ResourceDict[id]);
             }
             /// <summary>
             /// Add a new activity
             /// </summary>
             /// <param name="id">Id of the activity</param>
-            /// <param name="description">Description of the activity</param>
+            /// <param name="name">Description of the activity</param>
             /// <param name="duration">The random generator for duration timespan</param>
             /// <param name="requirements">List of tuples of resource Id and the quantity</param>
-            public void AddActivity(string id, Func<Random, TimeSpan> duration, List<(string, double)> requirements = null, string description = null, BatchSizeRange batchSizeRange = null)
+            public void AddActivity(Guid id, Func<Random, TimeSpan> duration, List<(Guid, double)> requirements, string name, BatchSizeRange batchSizeRange)
             {
-                if (requirements == null) requirements = new List<(string, double)>();
-                ActivityDict.Add(id, new Activity
+                if (requirements == null) requirements = new List<(Guid, double)>();
+                ActivityDict.Add(id, new Activity(name)
                 {
-                    Id = id,
-                    Name = description,
                     Duration = (rs, load, alloc) => duration(rs),
                     Requirements = requirements.Select(req => new Requirement
                     {
@@ -232,7 +231,7 @@ namespace O2DESNet.RCQueues
             /// <param name="from">The Id of the "from" activity</param>
             /// <param name="to">The Id of the "to" activity</param>
             /// <param name="weight">Relative weight of the relationship (when there are multiple succeedings)</param>
-            public void AddSucceeding(string from, string to, double weight)
+            public void AddSucceeding(Guid from, Guid to, double weight)
             {
                 SucceedingDict[ActivityDict[from]].Add(new Tuple<Activity, double>(ActivityDict[to], weight));
             }

@@ -22,4 +22,4 @@ IC_CO,Patient need to be observed? (IC),0,1,,,,IC_O;1:IC_T
 IC_O,Observation for IC,60,0.3,,,Beds_IC,IC_CO
 IC_T,Does patient need to transfer to hospital? (IC),0,1,,,,A;P
 A,Admission into hospital,10,1,,,,
-D,Patient depature,5,1,,,,
+D,Patient departure,5,1,,,,
