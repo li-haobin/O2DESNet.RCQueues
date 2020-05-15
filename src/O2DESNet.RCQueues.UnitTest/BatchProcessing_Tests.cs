@@ -1,8 +1,11 @@
 ﻿using NUnit.Framework;
+
+using O2DESNet.RCQueues.UnitTests.Samples;
+
 using System;
 using System.Diagnostics;
 
-namespace O2DESNet.RCQueues.UnitTest
+namespace O2DESNet.RCQueues.UnitTests
 {
     public class BatchProcessing_Tests
     {

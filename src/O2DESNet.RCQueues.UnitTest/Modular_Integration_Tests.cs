@@ -1,8 +1,12 @@
 ﻿using NUnit.Framework;
+
+using O2DESNet.RCQueues.Interfaces;
+using O2DESNet.RCQueues.UnitTests.Samples;
+
 using System;
 using System.Collections.Generic;
 
-namespace O2DESNet.RCQueues.UnitTest
+namespace O2DESNet.RCQueues.UnitTests
 {
     public class Modular_Integration_Tests
     {

@@ -1,9 +1,12 @@
 ﻿using NUnit.Framework;
+
+using O2DESNet.RCQueues.UnitTests.Samples;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace O2DESNet.RCQueues.UnitTest
+namespace O2DESNet.RCQueues.UnitTests
 {
     public class SimpleRCQ_Tests
     {
@@ -82,20 +85,32 @@ namespace O2DESNet.RCQueues.UnitTest
         [Test]
         public void Configure_SimpleRCQ_by_Methods_2()
         {
+            var res1 = Guid.NewGuid();
+            var res2 = Guid.NewGuid();
+
+            var act1Id = Guid.NewGuid();
+            var act2Id = Guid.NewGuid();
+
             var simpleRCQs = new SimpleRCQs.Statics();
-            simpleRCQs.AddResource("Res1", 10);
-            simpleRCQs.AddResource("Res2", 10);
-            simpleRCQs.AddActivity("Act1", rs => TimeSpan.FromMinutes(rs.NextDouble() * 5), new List<(string, double)>
-            {
-                ("Res1", 3),
-                ("Res2", 1),
-            });
-            simpleRCQs.AddActivity("Act2", rs => TimeSpan.FromMinutes(rs.NextDouble() * 10), new List<(string, double)>
-            {
-                ("Res1", 1),
-                ("Res2", 2),
-            });
-            simpleRCQs.AddSucceeding("Act1", "Act2", 1);
+
+            simpleRCQs.AddResource(res1, "Res1", 10, string.Empty);
+            simpleRCQs.AddResource(res2, "Res2", 10, string.Empty);
+            simpleRCQs.AddActivity(act1Id, "Act1",
+                rs => TimeSpan.FromMinutes(rs.NextDouble() * 5),
+                new List<(Guid, double)>
+                {
+                    (res1, 3),
+                    (res2, 1),
+                }, null);
+            simpleRCQs.AddActivity(act2Id, "Act2",
+                rs => TimeSpan.FromMinutes(rs.NextDouble() * 10),
+                new List<(Guid, double)>
+                {
+                    (res1, 1),
+                    (res2, 2),
+                }, null);
+
+            simpleRCQs.AddSucceeding(act1Id, act2Id, 1);
             simpleRCQs.Generator.MeanHourlyRate = 4;
 
             var sim = simpleRCQs.Sandbox();
