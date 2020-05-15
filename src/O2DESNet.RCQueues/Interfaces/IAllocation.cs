@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using O2DESNet.RCQueues.Common;
+
+using System.Collections.Generic;
 
 namespace O2DESNet.RCQueues.Interfaces
 {
@@ -10,7 +12,7 @@ namespace O2DESNet.RCQueues.Interfaces
         /// <summary>
         /// Map requirement to list of resource-quantity tuples allocated for it
         /// </summary>
-        IReadOnlyDictionary<IRequirement, IReadOnlyList<(IResource, double)>> Requirement_ResourceQuantityList { get; }
+        IReadOnlyDictionary<IRequirement, IReadOnlyList<ResourceQuantity>> Requirement_ResourceQuantityList { get; }
 
         /// <summary>
         /// Map resource to aggregated allocated quantity across all requirement

@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "O2DESNet.RCQueues", "src\O2
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "O2DESNet.RCQueues.UnitTest", "src\O2DESNet.RCQueues.UnitTest\O2DESNet.RCQueues.UnitTest.csproj", "{1F05CB89-C6C8-4B9E-9DDE-505CBBC196E4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Examples", "Examples\Examples.csproj", "{0C054A08-F3D9-479C-9369-5431101F1834}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{1F05CB89-C6C8-4B9E-9DDE-505CBBC196E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F05CB89-C6C8-4B9E-9DDE-505CBBC196E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F05CB89-C6C8-4B9E-9DDE-505CBBC196E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C054A08-F3D9-479C-9369-5431101F1834}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C054A08-F3D9-479C-9369-5431101F1834}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C054A08-F3D9-479C-9369-5431101F1834}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C054A08-F3D9-479C-9369-5431101F1834}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

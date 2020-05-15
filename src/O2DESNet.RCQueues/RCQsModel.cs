@@ -2,6 +2,7 @@
 using O2DESNet.RCQueues.Common;
 using O2DESNet.RCQueues.Interfaces;
 using O2DESNet.Standard;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,9 +67,9 @@ namespace O2DESNet.RCQueues
         private readonly HashSet<IActivity> _allActivities = new HashSet<IActivity>();
         private readonly HashSet<IActivity> _activitiesToTrace = new HashSet<IActivity>();
 
-        public IReadOnlyDictionary<IActivity, IReadOnlyList<ILoad>> ActivityToLoads { get { return _activityToLoads.AsReadOnly(); } }        
+        public IReadOnlyDictionary<IActivity, IReadOnlyList<ILoad>> ActivityToLoads { get { return _activityToLoads.AsReadOnly(); } }
         private readonly Dictionary<IActivity, HashSet<ILoad>> _activityToLoads;
-        
+
         public IReadOnlyDictionary<IActivity, IReadOnlyList<ILoad>> ActivityToLoads_Pending
         {
             get
@@ -79,7 +80,8 @@ namespace O2DESNet.RCQueues
         }
         private readonly Dictionary<IActivity, HashSet<ILoad>> _activityToLoads_Pending;
 
-        public IReadOnlyDictionary<IActivity, IReadOnlyList<ILoad>> ActivityToLoads_Active {
+        public IReadOnlyDictionary<IActivity, IReadOnlyList<ILoad>> ActivityToLoads_Active
+        {
             get
             {
                 return _activityToLoads_Active.OrderBy(i => i.Key.Id)
@@ -88,7 +90,8 @@ namespace O2DESNet.RCQueues
         }
         private readonly Dictionary<IActivity, HashSet<ILoad>> _activityToLoads_Active;
 
-        public IReadOnlyDictionary<IActivity, IReadOnlyList<ILoad>> ActivityToLoads_Passive {
+        public IReadOnlyDictionary<IActivity, IReadOnlyList<ILoad>> ActivityToLoads_Passive
+        {
             get
             {
                 return _activityToLoads_Passive.OrderBy(i => i.Key.Id)
@@ -113,7 +116,7 @@ namespace O2DESNet.RCQueues
         {
             get { return _activityToResources.AsReadOnly(); }
         }
-        private readonly Dictionary<IActivity, List<IResource>> _activityToResources;                
+        private readonly Dictionary<IActivity, List<IResource>> _activityToResources;
         #endregion
 
         #region by Resources
@@ -272,11 +275,11 @@ namespace O2DESNet.RCQueues
             }
         }
         private readonly Dictionary<IResource, Dictionary<IActivity, HourCounter>> _resourceActivityHC_Occupied;
-        #endregion        
+        #endregion
         #endregion
 
         #region Methods / Events
-        
+
         /// <summary>
         /// Enquiry for remaining capacity of given resource, for given load and activity
         /// </summary>
@@ -309,11 +312,11 @@ namespace O2DESNet.RCQueues
                     .OrderByDescending(i => i.Qtt).ToList(); /// map all available resource to its remaining capacity
 
                 if (pool.Sum(i => i.Qtt) < req.Quantity) return null; /// no sufficient resource
-                var toRqst = new List<(IResource, double)>();
-                while (toRqst.Sum(i => i.Item2) < req.Quantity)
+                var toRqst = new List<ResourceQuantity>();
+                while (toRqst.Sum(i => i.Quantity) < req.Quantity)
                 {
-                    var qtt = Math.Min(pool.First().Qtt, req.Quantity - toRqst.Sum(i => i.Item2));
-                    toRqst.Add((pool.First().Resource, qtt));
+                    var qtt = Math.Min(pool.First().Qtt, req.Quantity - toRqst.Sum(i => i.Quantity));
+                    toRqst.Add(new ResourceQuantity(pool.First().Resource, qtt));
                     staged[pool.First().Resource] += qtt;
                     pool.RemoveAt(0);
                 }
@@ -339,7 +342,7 @@ namespace O2DESNet.RCQueues
         {
             if (_activityToLoads[act].Count > 0 || _activitiesToTrace.Contains(act)) return;
             _activityToLoads.Remove(act);
-            _allActivities.Remove(act);            
+            _allActivities.Remove(act);
 
             foreach (var res in _activityToResources[act].ToList()) _resourceToActivities[res].Remove(act);
 
@@ -402,8 +405,8 @@ namespace O2DESNet.RCQueues
                 .Select(i => (i.Batch.Activity, i.Batch.Activity
                 .Requirements.Where(req => req.Pool.Contains(res)).Sum(req => req.Quantity)))
                 .GroupBy(t => t.Item1).ToDictionary(g => g.Key, g => g.Sum(t => t.Item2));
-            
-            foreach (var act in _resourceActivityHC_Pending[res].Keys)                
+
+            foreach (var act in _resourceActivityHC_Pending[res].Keys)
                 _resourceActivityHC_Pending[res][act].ObserveCount(qtts.ContainsKey(act) ? qtts[act] : 0);
             _resourceHc_Pending[res].ObserveCount(qtts.Values.Sum());
         }
@@ -473,7 +476,7 @@ namespace O2DESNet.RCQueues
         {
             if (batch.Count == 0)
             {
-                var released = ReleaseResources(new Batch[] { batch });                
+                var released = ReleaseResources(new Batch[] { batch });
                 if (released.Count > 0) RecallForPending(released.Keys);
             }
         }
@@ -494,7 +497,7 @@ namespace O2DESNet.RCQueues
         }
         private void Enter(ILoad load, IActivity init)
         {
-            Log("Enter", load, init);            
+            Log("Enter", load, init);
             OnEntered.Invoke(load, init);
         }
         private void AttemptToStart(Batch moveTo)
@@ -521,16 +524,16 @@ namespace O2DESNet.RCQueues
                 _batchToAllocation.Add(moveTo, request);
                 foreach (var i in request.Requirement_ResourceQuantityList)
                 {
-                    foreach (var (res, qtt) in i.Value)
+                    foreach (ResourceQuantity item in i.Value)
                     {
-                        if (released.ContainsKey(res))
+                        if (released.ContainsKey(item.Resource))
                         {
-                            released[res] -= qtt;
-                            if (released[res] <= 0) released.Remove(res);
+                            released[item.Resource] -= item.Quantity;
+                            if (released[item.Resource] <= 0) released.Remove(item.Resource);
                         }
                     }
                 }
-                 
+
                 /// clear from pending list
                 if (moveTo.Phase == BatchPhase.Pending)
                 {
@@ -604,7 +607,7 @@ namespace O2DESNet.RCQueues
                 moveTo.Phase = BatchPhase.Started;
 
                 /// check for the next batch in the same activity
-                if (_activityToBatchTimes_Pending[moveTo.Activity].Count > 0) 
+                if (_activityToBatchTimes_Pending[moveTo.Activity].Count > 0)
                     Schedule(() => AttemptToStart(_activityToBatchTimes_Pending[moveTo.Activity].First().Batch));
 
                 /// check for released resource
@@ -675,7 +678,7 @@ namespace O2DESNet.RCQueues
                 var qtt = i.Value;
                 _resourceBatchQuantity_Active[res].Remove(batch);
                 _resourceBatchQuantity_Passive[res].Add(batch, qtt);
-                _resourceHC_Active[res].ObserveChange(-qtt);                
+                _resourceHC_Active[res].ObserveChange(-qtt);
                 _resourceHC_Passive[res].ObserveChange(qtt);
                 if (_activitiesToTrace.Contains(act))
                 {
@@ -758,7 +761,7 @@ namespace O2DESNet.RCQueues
             RecallForPending(new List<IResource> { resource }); /// changing from passive pending to unlocked shall also trigger starting of new activities
             if (qtt > 0)
             {
-                Log("Unlocked", resource, qtt);                               
+                Log("Unlocked", resource, qtt);
                 OnUnlocked.Invoke(resource, qtt);
             }
         }
@@ -811,13 +814,13 @@ namespace O2DESNet.RCQueues
             _resourceBatchQuantity_Passive = Assets.Resources.ToDictionary(res => res, res => new Dictionary<IBatch, double>());
             _resourceQuantity_PendingLock = Assets.Resources.ToDictionary(res => res, res => 0d);
 
-            _activityToResources = new Dictionary<IActivity, List<IResource>>();            
+            _activityToResources = new Dictionary<IActivity, List<IResource>>();
             _activityToLoads = new Dictionary<IActivity, HashSet<ILoad>>();
             _activityToLoads_Pending = new Dictionary<IActivity, HashSet<ILoad>>();
             _activityToLoads_Active = new Dictionary<IActivity, HashSet<ILoad>>();
             _activityToLoads_Passive = new Dictionary<IActivity, HashSet<ILoad>>();
             _activityToBatchTimes_Pending = new Dictionary<IActivity, List<(Batch Batch, DateTime Time)>>();
-            _activityToBatches_Batching = new Dictionary<IActivity, List<Batch>>();            
+            _activityToBatches_Batching = new Dictionary<IActivity, List<Batch>>();
 
             _activityHC_Active = new Dictionary<IActivity, HourCounter>();
             _activityHC_Passive = new Dictionary<IActivity, HourCounter>();
@@ -872,8 +875,8 @@ namespace O2DESNet.RCQueues
                 str += string.Format("Id: {0}\tAct_Id: {1}\t", load,
                     _loadToBatch_Current[load] == null ? Guid.Empty : _loadToBatch_Current[load].Activity.Id);
                 if (_loadToBatch_Current[load] != null && _batchToAllocation.ContainsKey(_loadToBatch_Current[load]))
-                    foreach (var (res, qtt) in _batchToAllocation[_loadToBatch_Current[load]].Requirement_ResourceQuantityList.SelectMany(i => i.Value))
-                        str += string.Format("Res#{0}({1}) ", res.Id, qtt);
+                    foreach (ResourceQuantity item in _batchToAllocation[_loadToBatch_Current[load]].Requirement_ResourceQuantityList.SelectMany(i => i.Value))
+                        str += string.Format("Res#{0}({1}) ", item.Resource.Id, item.Quantity);
                 str += "\n";
             }
 
@@ -881,7 +884,7 @@ namespace O2DESNet.RCQueues
             foreach (var res in Assets.Resources)
             {
                 str += string.Format("Id: {0}\tOccupied: ", res.Id);
-                foreach (var current in _loadToBatch_Current.Values.Distinct().Where(curr => curr != null && 
+                foreach (var current in _loadToBatch_Current.Values.Distinct().Where(curr => curr != null &&
                     _batchToAllocation[curr].ResourceQuantity_Aggregated.ContainsKey(res) && _batchToAllocation[curr].ResourceQuantity_Aggregated[res] > 0))
                     str += string.Format("{0} ", current);
                 str += string.Format("\tPending:");

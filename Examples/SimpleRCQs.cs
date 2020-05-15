@@ -1,6 +1,8 @@
 ﻿using O2DESNet.Distributions;
+using O2DESNet.RCQueues.Common;
 using O2DESNet.RCQueues.Interfaces;
 using O2DESNet.Standard;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,7 +44,7 @@ namespace O2DESNet.RCQueues
                 public static readonly List<string> FieldsOfResource = new List<string> { Id, Capacity, Description };
                 public static readonly List<string> FieldsOfActivity = new List<string> { Id, Description, Duration_MeanInMinutes, Duration_CV, BatchSize_Min, BatchSize_Max, Requirements, Succeedings };
 
-                public static readonly string Arrivals = "Arrivals";
+                public const string Arrivals = "Arrivals";
 
                 public const string MeanHourlyRate = "Mean Hourly Rate";
                 public const string SeasonalFactors_HoursOfDay = "Seasonal Factors (Hours of Day)";
@@ -114,8 +116,11 @@ namespace O2DESNet.RCQueues
                     }
                     #endregion
 
+                    var id = Guid.NewGuid();
+
                     simpleRCQs.AddActivity(
-                        id: r[Key.Id],
+                        id: id,
+                        name: r[Key.Description],
                         duration: rs => TimeSpan.FromMinutes(
                             Gamma.Sample(rs, Convert.ToDouble(r[Key.Duration_MeanInMinutes]), Convert.ToDouble(r[Key.Duration_CV]))),
                         batchSizeRange: batchSizeRange,
@@ -123,8 +128,8 @@ namespace O2DESNet.RCQueues
                         {
                             var splits = str.Split(':');
                             return (splits[0], splits.Length > 1 ? Convert.ToDouble(splits[1]) : 1.0);
-                        }).ToList(),
-                        name: r[Key.Description]
+                        }).ToList()
+                        
                         );
                 }
                 foreach (var r in data_activities)
@@ -186,8 +191,8 @@ namespace O2DESNet.RCQueues
 
             private readonly Dictionary<Guid, Resource> ResourceDict = new Dictionary<Guid, Resource>();
             private readonly Dictionary<Guid, Activity> ActivityDict = new Dictionary<Guid, Activity>();
-            private readonly Dictionary<Activity, List<Tuple<Activity, double>>> SucceedingDict
-                = new Dictionary<Activity, List<Tuple<Activity, double>>>();
+            private readonly Dictionary<Activity, List<ActivityQuantity>> SucceedingDict
+                = new Dictionary<Activity, List<ActivityQuantity>>();
 
             /// <summary>
             /// Add a new resource
@@ -200,6 +205,32 @@ namespace O2DESNet.RCQueues
                 ResourceDict.Add(id, new Resource(id, name) { Capacity = capacity});
                 Resources.Add(ResourceDict[id]);
             }
+
+            public void AddActivity(string name, Func<Random, TimeSpan> duration, List<(Guid, double)> requirements, BatchSizeRange batchSizeRange)
+            {
+                if (requirements == null) requirements = new List<(Guid, double)>();
+
+                var id = Guid.NewGuid();
+
+                ActivityDict.Add(id, new Activity(id, name)
+                {
+                    Duration = (rs, load, alloc) => duration(rs),
+                    Requirements = requirements.Select(req => new Requirement
+                    {
+                        Pool = new HashSet<IResource> { ResourceDict[req.Item1] },
+                        Quantity = req.Item2,
+                    }).ToList(),
+                    Succeedings = (rs, load) => SucceedingDict[ActivityDict[id]].Count > 0 ?
+                        SucceedingDict[ActivityDict[id]][Empirical.Sample(rs, SucceedingDict[ActivityDict[id]].Select(t => t.Item2))].Item1 : null,
+                });
+
+                if (batchSizeRange != null) ActivityDict[id].BatchSizeRange = batchSizeRange;
+
+                Activities.Add(ActivityDict[id]);
+
+                SucceedingDict.Add(ActivityDict[id], new List<ActivityQuantity>());
+            }
+
             /// <summary>
             /// Add a new activity
             /// </summary>
@@ -223,8 +254,9 @@ namespace O2DESNet.RCQueues
                 });
                 if (batchSizeRange != null) ActivityDict[id].BatchSizeRange = batchSizeRange;
                 Activities.Add(ActivityDict[id]);
-                SucceedingDict.Add(ActivityDict[id], new List<Tuple<Activity, double>>());
+                SucceedingDict.Add(ActivityDict[id], new List<ActivityQuantity>());
             }
+
             /// <summary>
             /// Add succeeding relationship between two activities
             /// </summary>
@@ -233,7 +265,7 @@ namespace O2DESNet.RCQueues
             /// <param name="weight">Relative weight of the relationship (when there are multiple succeedings)</param>
             public void AddSucceeding(Guid from, Guid to, double weight)
             {
-                SucceedingDict[ActivityDict[from]].Add(new Tuple<Activity, double>(ActivityDict[to], weight));
+                SucceedingDict[ActivityDict[from]].Add(new ActivityQuantity(ActivityDict[to], weight));
             }
         }
 
@@ -291,7 +323,7 @@ namespace O2DESNet.RCQueues
 
             RS = Assets.Activities.ToDictionary(act => act, act => new Random(DefaultRS.Next()));
 
-            /// Init
+            /// Initialized
             Generator.Start();
         }
 
