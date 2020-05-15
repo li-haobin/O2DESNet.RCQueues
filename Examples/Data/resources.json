@@ -1,0 +1,34 @@
+[
+  {
+    "Id": "71e6151c-359e-4e34-8dcf-8b924f70641b",
+    "Name": "Beds_CC_AC",
+    "Capacity": 20,
+    "Description": "Beds in the observation area for CC and AC patients"
+  },
+  {
+    "Id": "32b5b395-73c3-42e2-9b05-9940321007af",
+    "Name": "Beds_IC",
+    "Capacity": 10,
+    "Description": "Beds in the observation area for IC patients"
+  },
+  {
+    "Id": "76cc6370-04c4-476d-b04e-ed5674650485",
+    "Name": "Docs_CC",
+    "Capacity": 5,
+    "Description": "Doctors for CC patients"
+  },
+  {
+    "Id": "6461971c-afa0-4fa5-9d69-967364b0f8d3",
+    "Name": "Docs_AC",
+    "Capacity": 5,
+    "Description": "Doctors for AC patients"
+  },
+  {
+    "Id": "6461971c-afa0-4fa5-9d69-967364b0f8d3",
+    "Name": "Docs_IC",
+    "Capacity": 5,
+    "Description": "Doctors for IC patients"
+  }
+]
+
+

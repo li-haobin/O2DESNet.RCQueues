@@ -1,10 +1,13 @@
-﻿using O2DESNet.Distributions;
+﻿using O2DESNet;
+using O2DESNet.Distributions;
+using O2DESNet.RCQueues;
+using O2DESNet.RCQueues.Interfaces;
 using O2DESNet.Standard;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace O2DESNet.RCQueues.UnitTest
+namespace Examples.Testbeds
 {
     public class Testbed : Sandbox<Testbed.Statics>
     {

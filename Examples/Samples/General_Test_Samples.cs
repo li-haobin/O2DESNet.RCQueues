@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace O2DESNet.RCQueues.UnitTest
+namespace Examples.Samples
 {
     public static class General_Test_Samples 
     {

@@ -6,7 +6,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Data\" />
+    <PackageReference Include="O2DESNet" Version="3.6.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\O2DESNet.RCQueues\O2DESNet.RCQueues.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Data\Sample1\Activities.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Sample1\Resources.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

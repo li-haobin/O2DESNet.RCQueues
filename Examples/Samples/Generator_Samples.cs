@@ -1,6 +1,6 @@
 ﻿using O2DESNet.Standard;
 
-namespace O2DESNet.RCQueues.UnitTest
+namespace Examples.Samples
 {
     static class Generator_Samples
     {

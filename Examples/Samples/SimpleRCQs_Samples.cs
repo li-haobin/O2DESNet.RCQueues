@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace O2DESNet.RCQueues.UnitTest
+namespace Examples.Samples
 {
     public static class SimpleRCQs_Samples
     {
@@ -9,6 +9,7 @@ namespace O2DESNet.RCQueues.UnitTest
         {
             return SimpleRCQs.Statics.ReadFromCSVs("SimpleRCQ\\Sample1");
         }
+
         public static SimpleRCQs.Statics Sample1s()
         {
             return SimpleRCQs.Statics.ReadFromCSVs("SimpleRCQ\\Sample1s");

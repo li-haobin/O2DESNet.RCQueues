@@ -1,4 +1,7 @@
-﻿using O2DESNet.Distributions;
+﻿using Examples.Testbeds;
+
+using O2DESNet.Distributions;
+using O2DESNet.RCQueues;
 using O2DESNet.RCQueues.Interfaces;
 using O2DESNet.Standard;
 
@@ -6,13 +9,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace O2DESNet.RCQueues.UnitTest
+namespace Examples.Samples
 {
     public static class Batch_Processing_Samples
     {
         public static Testbed.Statics Sample1()
         {
-            var resources = Enumerable.Range(0, 10).Select(id => (IResource)new Resource { Id = id.ToString(), Capacity = 1 }).ToList();
+            var resources = Enumerable.Range(0, 10)
+                .Select(id => (IResource)new Resource(Guid.NewGuid(), id.ToString()) { Capacity = 1 }).ToList();
 
             HashSet<IResource> GetPool(Func<IResource, bool> condition)
             {

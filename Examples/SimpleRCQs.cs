@@ -1,4 +1,6 @@
-﻿using O2DESNet.Distributions;
+﻿using O2DESNet;
+using O2DESNet.Distributions;
+using O2DESNet.RCQueues;
 using O2DESNet.RCQueues.Common;
 using O2DESNet.RCQueues.Interfaces;
 using O2DESNet.Standard;
@@ -8,7 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace O2DESNet.RCQueues
+namespace Examples
 {
     public class SimpleRCQs : Sandbox<SimpleRCQs.Statics>
     {
@@ -55,6 +57,9 @@ namespace O2DESNet.RCQueues
                 public static readonly List<string> FieldsOfArrivals = new List<string> { MeanHourlyRate, SeasonalFactors_HoursOfDay, SeasonalFactors_DaysOfWeek, SeasonalFactors_DaysOfMonth, SeasonalFactors_MonthsOfYear, SeasonalFactors_Years };
             }
 
+            private static readonly Dictionary<string, Guid> _lookupResourcesId = new Dictionary<string, Guid>();
+            private static readonly Dictionary<string, Guid> _lookupActivitiesId = new Dictionary<string, Guid>();
+
             public static void WriteTemplateCSVs(string dir = null)
             {
                 if (dir == null) dir = Directory.GetCurrentDirectory();
@@ -85,23 +90,31 @@ namespace O2DESNet.RCQueues
                 var simpleRCQs = new Statics();
 
                 #region Read Resources
-                foreach (var r in ReadDataDictFromCSV(string.Format("{0}\\{1}.csv", dir, Key.Resources)))
+                foreach (var row in ReadDataDictFromCSV($@"{dir}\{Key.Resources}.csv"))
                 {
-                    simpleRCQs.AddResource(r[Key.Id], Convert.ToDouble(r[Key.Capacity]), r[Key.Description]);
+                    var id = Guid.NewGuid();
+                    var name = row[Key.Id];
+                    var capacity = Convert.ToDouble(row[Key.Capacity]);
+                    var description = row[Key.Description];
+
+                    if (!_lookupResourcesId.ContainsKey(name))
+                        _lookupResourcesId.Add(name, id);
+
+                    simpleRCQs.AddResource(id, name, capacity, description);
                 }
                 #endregion
 
                 #region Read Activities
-                var data_activities = ReadDataDictFromCSV(string.Format("{0}\\{1}.csv", dir, Key.Activities));
-                foreach (var r in data_activities)
+                var data_activities = ReadDataDictFromCSV($@"{dir}\{Key.Activities}.csv");
+                foreach (var row in data_activities)
                 {
                     #region Get range of batch size
                     int? minBatchSize = null, maxBatchSize = null;
                     BatchSizeRange batchSizeRange = new BatchSizeRange();
-                    if (r.ContainsKey(Key.BatchSize_Min) && r[Key.BatchSize_Min] != null && r[Key.BatchSize_Min].Length > 0)
-                        minBatchSize = int.Parse(r[Key.BatchSize_Min]);
-                    if (r.ContainsKey(Key.BatchSize_Max) && r[Key.BatchSize_Max] != null && r[Key.BatchSize_Max].Length > 0)
-                        maxBatchSize = int.Parse(r[Key.BatchSize_Max]);
+                    if (row.ContainsKey(Key.BatchSize_Min) && row[Key.BatchSize_Min] != null && row[Key.BatchSize_Min].Length > 0)
+                        minBatchSize = int.Parse(row[Key.BatchSize_Min]);
+                    if (row.ContainsKey(Key.BatchSize_Max) && row[Key.BatchSize_Max] != null && row[Key.BatchSize_Max].Length > 0)
+                        maxBatchSize = int.Parse(row[Key.BatchSize_Max]);
                     if (minBatchSize != null && maxBatchSize != null)
                     {
                         batchSizeRange = new BatchSizeRange(minBatchSize.Value, maxBatchSize.Value);
@@ -117,30 +130,52 @@ namespace O2DESNet.RCQueues
                     #endregion
 
                     var id = Guid.NewGuid();
+                    var ids = row[Key.Id];
+
+                    if (!_lookupActivitiesId.ContainsKey(ids))
+                        _lookupActivitiesId.Add(ids, id);
+
+                    var name = row[Key.Description];
+                    var capacity = Convert.ToDouble(row[Key.Capacity]);
+                    var description = row[Key.Description];
+                    var duration = Convert.ToDouble(row[Key.Duration_MeanInMinutes]);
+                    var cv = Convert.ToDouble(row[Key.Duration_CV]);
 
                     simpleRCQs.AddActivity(
                         id: id,
-                        name: r[Key.Description],
-                        duration: rs => TimeSpan.FromMinutes(
-                            Gamma.Sample(rs, Convert.ToDouble(r[Key.Duration_MeanInMinutes]), Convert.ToDouble(r[Key.Duration_CV]))),
+                        name: name,
+                        duration: rs => TimeSpan.FromMinutes(Gamma.Sample(rs, duration, cv)),
                         batchSizeRange: batchSizeRange,
-                        requirements: r[Key.Requirements].Split(';').Where(str => str.Length > 0).Select(str =>
-                        {
-                            var splits = str.Split(':');
-                            return (splits[0], splits.Length > 1 ? Convert.ToDouble(splits[1]) : 1.0);
-                        }).ToList()
-                        
+                        requirements: row[Key.Requirements].Split(';')
+                            .Where(str => str.Length > 0).Select(str =>
+                            {
+                                var splits = str.Split(':');
+                                var id = _lookupActivitiesId[splits[0]];
+                                return (id, splits.Length > 1 ? Convert.ToDouble(splits[1]) : 1.0);
+                            }).ToList()
+
                         );
                 }
-                foreach (var r in data_activities)
+
+                foreach (var row in data_activities)
                 {
-                    if (r[Key.Succeedings].Length > 0)
+                    if (row[Key.Succeedings].Length > 0)
                     {
-                        foreach (var succStr in r[Key.Succeedings].Split(';'))
+                        foreach (var succStr in row[Key.Succeedings].Split(';'))
                         {
                             var splits = succStr.Split(':');
-                            if (splits.Length > 1) simpleRCQs.AddSucceeding(r[Key.Id], splits[1], Convert.ToDouble(splits[0]));
-                            else simpleRCQs.AddSucceeding(r[Key.Id], splits[0], 1);
+                            if (splits.Length > 1)
+                            {
+                                var fromId = _lookupActivitiesId[Key.Id];
+                                var toId = _lookupActivitiesId[splits[1]];
+                                simpleRCQs.AddSucceeding(fromId, toId, Convert.ToDouble(splits[0]));
+                            }
+                            else
+                            {
+                                var fromId = _lookupActivitiesId[Key.Id];
+                                var toId = _lookupActivitiesId[splits[0]];
+                                simpleRCQs.AddSucceeding(fromId, toId, 1);
+                            }
                         }
                     }
                 }
@@ -200,60 +235,43 @@ namespace O2DESNet.RCQueues
             /// <param name="id">Id of the resource</param>
             /// <param name="capacity">Capacity of the resource</param>
             /// <param name="description">Description of the resource</param>
-            public void AddResource(Guid id, double capacity, string name)
+            public void AddResource(Guid id, string name, double capacity, string description)
             {
-                ResourceDict.Add(id, new Resource(id, name) { Capacity = capacity});
+                ResourceDict.Add(id, new Resource(id, name) { Capacity = capacity, Description = description });
                 Resources.Add(ResourceDict[id]);
             }
 
-            public void AddActivity(string name, Func<Random, TimeSpan> duration, List<(Guid, double)> requirements, BatchSizeRange batchSizeRange)
-            {
-                if (requirements == null) requirements = new List<(Guid, double)>();
-
-                var id = Guid.NewGuid();
-
-                ActivityDict.Add(id, new Activity(id, name)
-                {
-                    Duration = (rs, load, alloc) => duration(rs),
-                    Requirements = requirements.Select(req => new Requirement
-                    {
-                        Pool = new HashSet<IResource> { ResourceDict[req.Item1] },
-                        Quantity = req.Item2,
-                    }).ToList(),
-                    Succeedings = (rs, load) => SucceedingDict[ActivityDict[id]].Count > 0 ?
-                        SucceedingDict[ActivityDict[id]][Empirical.Sample(rs, SucceedingDict[ActivityDict[id]].Select(t => t.Item2))].Item1 : null,
-                });
-
-                if (batchSizeRange != null) ActivityDict[id].BatchSizeRange = batchSizeRange;
-
-                Activities.Add(ActivityDict[id]);
-
-                SucceedingDict.Add(ActivityDict[id], new List<ActivityQuantity>());
-            }
-
             /// <summary>
-            /// Add a new activity
+            /// Adds the activity.
             /// </summary>
-            /// <param name="id">Id of the activity</param>
-            /// <param name="name">Description of the activity</param>
-            /// <param name="duration">The random generator for duration timespan</param>
-            /// <param name="requirements">List of tuples of resource Id and the quantity</param>
-            public void AddActivity(Guid id, Func<Random, TimeSpan> duration, List<(Guid, double)> requirements, string name, BatchSizeRange batchSizeRange)
+            /// <param name="id">The identifier.</param>
+            /// <param name="name">The name.</param>
+            /// <param name="duration">The duration.</param>
+            /// <param name="requirements">The requirements.</param>
+            /// <param name="batchSizeRange">The batch size range.</param>
+            public void AddActivity(Guid id, string name, Func<Random, TimeSpan> duration, List<(Guid id, double quantity)> requirements, BatchSizeRange batchSizeRange)
             {
-                if (requirements == null) requirements = new List<(Guid, double)>();
-                ActivityDict.Add(id, new Activity(name)
+                if (requirements == null) requirements = new List<(Guid id, double quantity)>();
+
+                var activity = new Activity(id, name)
                 {
                     Duration = (rs, load, alloc) => duration(rs),
                     Requirements = requirements.Select(req => new Requirement
                     {
-                        Pool = new HashSet<IResource> { ResourceDict[req.Item1] },
-                        Quantity = req.Item2,
-                    }).ToList(),
-                    Succeedings = (rs, load) => SucceedingDict[ActivityDict[id]].Count > 0 ?
-                        SucceedingDict[ActivityDict[id]][Empirical.Sample(rs, SucceedingDict[ActivityDict[id]].Select(t => t.Item2))].Item1 : null,
-                });
+                        Pool = new HashSet<IResource> { ResourceDict[req.id] },
+                        Quantity = req.quantity,
+                    }).ToList()
+                };
+
+                activity.Succeedings = (rs, load) => SucceedingDict[activity].Count > 0 ?
+                        SucceedingDict[activity][Empirical.Sample(rs, SucceedingDict[activity].Select(t => t.Quantity))].Activity : null;
+
+                ActivityDict.Add(id, activity);
+
                 if (batchSizeRange != null) ActivityDict[id].BatchSizeRange = batchSizeRange;
+
                 Activities.Add(ActivityDict[id]);
+
                 SucceedingDict.Add(ActivityDict[id], new List<ActivityQuantity>());
             }
 
@@ -293,7 +311,7 @@ namespace O2DESNet.RCQueues
         {
             Log("Start", batch);
             var act = (Activity)batch.Activity;
-            Schedule(() => Finish(batch), 
+            Schedule(() => Finish(batch),
                 act.Duration(RS[act], batch, RCQsModel.BatchToAllocation[batch]));
         }
 
