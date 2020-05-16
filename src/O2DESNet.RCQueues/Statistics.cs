@@ -9,7 +9,7 @@ namespace O2DESNet.RCQueues
         /// <summary>
         /// Output statistics of stationary analysis
         /// </summary>        
-        public static void Output_Statistics_CSVs(this RCQsModel rcq, string dir = null)
+        public static void Output_Statistics_CSVs(this RCQueuesModel rcq, string dir = null)
         {
             if (dir == null) dir = Directory.GetCurrentDirectory();
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
@@ -21,15 +21,15 @@ namespace O2DESNet.RCQueues
                 foreach (var act in rcq.AllActivities)
                 {
                     sw.Write("{0},", act.Name);
-                    sw.Write("{0},", rcq.ActivityHC_Pending[act].AverageCount);
-                    sw.Write("{0},", rcq.ActivityHC_Active[act].AverageCount);
-                    sw.Write("{0},", rcq.ActivityHC_Passive[act].AverageCount);
-                    sw.Write("{0},", rcq.ActivityHC_Pending[act].AverageDuration.TotalHours);
-                    sw.Write("{0},", rcq.ActivityHC_Active[act].AverageDuration.TotalHours);
-                    sw.Write("{0},", rcq.ActivityHC_Passive[act].AverageDuration.TotalHours);
-                    sw.Write("{0},", rcq.ActivityHC_Active[act].TotalIncrement);
-                    sw.Write("{0},", rcq.ActivityHC_Active[act].TotalIncrement - rcq.ActivityHC_Passive[act].TotalDecrement);
-                    sw.Write("{0},", rcq.ActivityHC_Passive[act].TotalDecrement);
+                    sw.Write("{0},", rcq.ActivityHcPending[act].AverageCount);
+                    sw.Write("{0},", rcq.ActivityHcActive[act].AverageCount);
+                    sw.Write("{0},", rcq.ActivityHcPassive[act].AverageCount);
+                    sw.Write("{0},", rcq.ActivityHcPending[act].AverageDuration.TotalHours);
+                    sw.Write("{0},", rcq.ActivityHcActive[act].AverageDuration.TotalHours);
+                    sw.Write("{0},", rcq.ActivityHcPassive[act].AverageDuration.TotalHours);
+                    sw.Write("{0},", rcq.ActivityHcActive[act].TotalIncrement);
+                    sw.Write("{0},", rcq.ActivityHcActive[act].TotalIncrement - rcq.ActivityHcPassive[act].TotalDecrement);
+                    sw.Write("{0},", rcq.ActivityHcPassive[act].TotalDecrement);
                     sw.WriteLine();
                 }
             }
@@ -44,12 +44,12 @@ namespace O2DESNet.RCQueues
 
                     sw.Write("{0},", res.Name);
                     sw.Write("{0},", res.Capacity);
-                    sw.Write("{0},", rcq.ResourceHC_Available[res].AverageCount);
-                    sw.Write("{0},", rcq.ResourceHC_Pending[res].AverageCount);
-                    sw.Write("{0},", rcq.ResourceHC_Active[res].AverageCount);
-                    sw.Write("{0},", rcq.ResourceHC_Passive[res].AverageCount);
-                    sw.Write("{0},", (rcq.ResourceHC_Active[res].AverageCount + rcq.ResourceHC_Passive[res].AverageCount)
-                        / rcq.ResourceHC_Available[res].AverageCount);
+                    sw.Write("{0},", rcq.ResourceHcAvailable[res].AverageCount);
+                    sw.Write("{0},", rcq.ResourceHcPending[res].AverageCount);
+                    sw.Write("{0},", rcq.ResourceHcActive[res].AverageCount);
+                    sw.Write("{0},", rcq.ResourceHcPassive[res].AverageCount);
+                    sw.Write("{0},", (rcq.ResourceHcActive[res].AverageCount + rcq.ResourceHcPassive[res].AverageCount)
+                        / rcq.ResourceHcAvailable[res].AverageCount);
                     sw.WriteLine();
                     if (rcq.Assets.Activities.Count > 0)
                     {
@@ -58,13 +58,13 @@ namespace O2DESNet.RCQueues
                         {
                             sw.Write("{0},", act.Id);
                             sw.Write("{0},", res.Capacity);
-                            sw.Write("{0},", rcq.ResourceHC_Available[res].AverageCount);
-                            sw.Write("{0},", rcq.ResourceActivityHC_Pending[res][act].AverageCount);
-                            sw.Write("{0},", rcq.ResourceActivityHC_Active[res][act].AverageCount);
-                            sw.Write("{0},", rcq.ResourceActivityHC_Passive[res][act].AverageCount);
-                            sw.Write("{0},", (rcq.ResourceActivityHC_Active[res][act].AverageCount 
-                                + rcq.ResourceActivityHC_Passive[res][act].AverageCount)
-                                / rcq.ResourceHC_Available[res].AverageCount);
+                            sw.Write("{0},", rcq.ResourceHcAvailable[res].AverageCount);
+                            sw.Write("{0},", rcq.ResourceActivityHcPending[res][act].AverageCount);
+                            sw.Write("{0},", rcq.ResourceActivityHcActive[res][act].AverageCount);
+                            sw.Write("{0},", rcq.ResourceActivityHcPassive[res][act].AverageCount);
+                            sw.Write("{0},", (rcq.ResourceActivityHcActive[res][act].AverageCount 
+                                + rcq.ResourceActivityHcPassive[res][act].AverageCount)
+                                / rcq.ResourceHcAvailable[res].AverageCount);
                             sw.WriteLine();
                         }
                         sw.WriteLine();
@@ -75,19 +75,19 @@ namespace O2DESNet.RCQueues
         /// <summary>
         /// Output statistics on the snapshot
         /// </summary>
-        public static void Output_Snapshot_CSVs(this RCQsModel rcq, DateTime clockTime, string dir = null)
+        public static void Output_Snapshot_CSVs(this RCQueuesModel rcq, DateTime clockTime, string dir = null)
         {
             if (dir == null) dir = Directory.GetCurrentDirectory();
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-            var str_clockTime = clockTime.ToString("yyyy-MM-dd-HH-mm-ss");
-            using (var sw = new StreamWriter(string.Format("{0}\\Snapshot_{1}.csv", dir, str_clockTime)))
+            var strClockTime = clockTime.ToString("yyyy-MM-dd-HH-mm-ss");
+            using (var sw = new StreamWriter($"{dir}\\Snapshot_{strClockTime}.csv"))
             {
                 sw.WriteLine("Load,Activity,Resource,Quantity,Type");
                 foreach(var load in rcq.AllLoads)
                 {
-                    var pending = rcq.LoadToBatch_MovingTo[load] != null; /// MoveTos[load] is set to null if the load is processed in activity
-                    var batch = rcq.LoadToBatch_Current[load];
-                    foreach (var i in rcq.BatchToAllocation[batch].ResourceQuantity_Aggregated)
+                    var pending = rcq.LoadToBatchMovingTo[load] != null; /// MoveTos[load] is set to null if the load is processed in activity
+                    var batch = rcq.LoadToBatchCurrent[load];
+                    foreach (var i in rcq.BatchToAllocation[batch].ResourceQuantityAggregated)
                     {
                         var res = i.Key;
                         var qtt = i.Value;
@@ -95,7 +95,7 @@ namespace O2DESNet.RCQueues
                     }
                     if (pending)
                     {
-                        batch = rcq.LoadToBatch_MovingTo[load];
+                        batch = rcq.LoadToBatchMovingTo[load];
                         foreach (var res in rcq.ActivityToResources[batch.Activity])
                         {
                             var qtt = batch.Activity.Requirements.Where(req => req.Pool.Contains(res)).Sum(req => req.Quantity);
@@ -106,9 +106,9 @@ namespace O2DESNet.RCQueues
 
                 sw.WriteLine();
                 sw.WriteLine(",# of Loads");
-                sw.WriteLine("Arrived,{0}", rcq.CountOfLoads_Entered);
-                sw.WriteLine("Processing,{0}", rcq.CountOfLoads_Processing);
-                sw.WriteLine("Processed,{0}", rcq.CountOfLoads_Exited);
+                sw.WriteLine("Arrived,{0}", rcq.CountOfLoadsEntered);
+                sw.WriteLine("Processing,{0}", rcq.CountOfLoadsProcessing);
+                sw.WriteLine("Processed,{0}", rcq.CountOfLoadsExited);
             }
         }
     }

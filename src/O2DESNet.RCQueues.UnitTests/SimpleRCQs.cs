@@ -65,17 +65,17 @@ namespace O2DESNet.RCQueues.UnitTests
             {
                 if (dir == null) dir = Directory.GetCurrentDirectory();
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                using (var sw = new StreamWriter(string.Format("{0}\\{1}.csv", dir, Key.Activities)))
+                using (var sw = new StreamWriter($"{dir}\\{Key.Activities}.csv"))
                 {
                     foreach (var key in Key.FieldsOfActivity) sw.Write("{0},", key);
                     sw.WriteLine();
                 }
-                using (var sw = new StreamWriter(string.Format("{0}\\{1}.csv", dir, Key.Resources)))
+                using (var sw = new StreamWriter($"{dir}\\{Key.Resources}.csv"))
                 {
                     foreach (var key in Key.FieldsOfResource) sw.Write("{0},", key);
                     sw.WriteLine();
                 }
-                using (var sw = new StreamWriter(string.Format("{0}\\{1}.csv", dir, Key.Arrivals)))
+                using (var sw = new StreamWriter($"{dir}\\{Key.Arrivals}.csv"))
                 {
                     foreach (var key in Key.FieldsOfArrivals) sw.WriteLine("{0},", key);
                     sw.WriteLine();
@@ -231,21 +231,21 @@ namespace O2DESNet.RCQueues.UnitTests
                 return Enumerable.Range(1, rows.Count - 1).Select(i => Enumerable.Range(0, nCols).ToDictionary(j => rows[0][j], j => rows[i][j])).ToList();
             }
 
-            private readonly Dictionary<Guid, Resource> ResourceDict = new Dictionary<Guid, Resource>();
-            private readonly Dictionary<Guid, Activity> ActivityDict = new Dictionary<Guid, Activity>();
-            private readonly Dictionary<Activity, List<ActivityQuantity>> SucceedingDict
-                = new Dictionary<Activity, List<ActivityQuantity>>();
+            private readonly Dictionary<Guid, Resource> _resourceDict = new Dictionary<Guid, Resource>();
+            private readonly Dictionary<Guid, Activity> _activityDict = new Dictionary<Guid, Activity>();
+            private readonly Dictionary<Activity, List<ActivityQuantity>> _succeedingDict = new Dictionary<Activity, List<ActivityQuantity>>();
 
             /// <summary>
             /// Add a new resource
             /// </summary>
             /// <param name="id">Id of the resource</param>
+            /// <param name="name"></param>
             /// <param name="capacity">Capacity of the resource</param>
             /// <param name="description">Description of the resource</param>
             public void AddResource(Guid id, string name, double capacity, string description)
             {
-                ResourceDict.Add(id, new Resource(id, name) { Capacity = capacity, Description = description });
-                Resources.Add(ResourceDict[id]);
+                _resourceDict.Add(id, new Resource(id, name) { Capacity = capacity, Description = description });
+                Resources.Add(_resourceDict[id]);
             }
 
             /// <summary>
@@ -265,7 +265,7 @@ namespace O2DESNet.RCQueues.UnitTests
                     Duration = (rs, load, alloc) => duration(rs),
                     Requirements = requirements.Select(req => new Requirement
                     {
-                        Pool = new HashSet<IResource> { ResourceDict[req.id] },
+                        Pool = new HashSet<IResource> { _resourceDict[req.id] },
                         Quantity = req.quantity,
                     }).ToList()
                 };
@@ -273,12 +273,12 @@ namespace O2DESNet.RCQueues.UnitTests
                 if (batchSizeRange != null)
                     activity.BatchSizeRange = batchSizeRange;
 
-                activity.Succeedings = (rs, load) => SucceedingDict[activity].Count > 0 ?
-                        SucceedingDict[activity][Empirical.Sample(rs, SucceedingDict[activity].Select(t => t.Quantity))].Activity : null;
+                activity.Succeedings = (rs, load) => _succeedingDict[activity].Count > 0 ?
+                        _succeedingDict[activity][Empirical.Sample(rs, _succeedingDict[activity].Select(t => t.Quantity))].Activity : null;
 
-                ActivityDict.Add(id, activity);
+                _activityDict.Add(id, activity);
                 Activities.Add(activity);
-                SucceedingDict.Add(activity, new List<ActivityQuantity>());
+                _succeedingDict.Add(activity, new List<ActivityQuantity>());
             }
 
             /// <summary>
@@ -286,15 +286,15 @@ namespace O2DESNet.RCQueues.UnitTests
             /// </summary>
             /// <param name="from">The Id of the "from" activity</param>
             /// <param name="to">The Id of the "to" activity</param>
-            /// <param name="weight">Relative weight of the relationship (when there are multiple succeedings)</param>
+            /// <param name="weight">Relative weight of the relationship (when there are multiple succeeding)</param>
             public void AddSucceeding(Guid from, Guid to, double weight)
             {
-                SucceedingDict[ActivityDict[from]].Add(new ActivityQuantity(ActivityDict[to], weight));
+                _succeedingDict[_activityDict[from]].Add(new ActivityQuantity(_activityDict[to], weight));
             }
         }
 
         #region Dynamic Properties        
-        public readonly RCQsModel RCQsModel;
+        public readonly RCQueuesModel RCQsModel;
         private readonly PatternGenerator Generator;
         private readonly Dictionary<Activity, Random> RS;
         #endregion
@@ -336,7 +336,7 @@ namespace O2DESNet.RCQueues.UnitTests
 
         public SimpleRCQs(Statics assets, int seed, string id = null) : base(assets, seed, id)
         {
-            RCQsModel = AddChild(new RCQsModel(new RCQsModel.Statics(Assets.Resources, Assets.Activities), DefaultRS.Next()));
+            RCQsModel = AddChild(new RCQueuesModel(new RCQueuesModel.Statics(Assets.Resources, Assets.Activities), DefaultRS.Next()));
             Generator = AddChild(new PatternGenerator(Assets.Generator, DefaultRS.Next()));
 
 
@@ -347,7 +347,7 @@ namespace O2DESNet.RCQueues.UnitTests
 
             RS = Assets.Activities.ToDictionary(act => act, act => new Random(DefaultRS.Next()));
 
-            /// Initialized
+            // Initialized
             Generator.Start();
         }
 

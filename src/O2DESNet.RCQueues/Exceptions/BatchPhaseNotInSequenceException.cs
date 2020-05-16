@@ -2,7 +2,7 @@
 
 using System;
 
-namespace O2DESNet.RCQueues.Common
+namespace O2DESNet.RCQueues.Exceptions
 {
     /// <summary>
     /// Batch phase not in sequence exception

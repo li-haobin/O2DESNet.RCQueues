@@ -1,4 +1,5 @@
 ﻿using O2DESNet.RCQueues.Common;
+using O2DESNet.RCQueues.Exceptions;
 using O2DESNet.RCQueues.Interfaces;
 using O2DESNet.Standard;
 
@@ -11,11 +12,18 @@ namespace O2DESNet.RCQueues
     {
         private BatchPhase _phase = BatchPhase.Batching;
 
+        /// <summary>
+        /// Gets or sets the activity.
+        /// </summary>
         public IActivity Activity { get; set; }
 
+        /// <summary>
+        /// Gets or sets the phase.
+        /// </summary>
+        /// <exception cref="O2DESNet.RCQueues.Exceptions.BatchPhaseNotInSequenceException"></exception>
         public BatchPhase Phase
         {
-            get { return _phase; }
+            get => _phase;
             set
             {
                 if ((value == BatchPhase.Batching) ||
@@ -29,10 +37,12 @@ namespace O2DESNet.RCQueues
             }
         }
 
-        public Batch() : base() { }
-        public override string ToString()
-        {
-            return string.Format("({0})", string.Join(",", this.OrderBy(l => l.Index)));
-        }
+        /// <summary>
+        /// Converts to string.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public override string ToString() => $"({string.Join(",", this.OrderBy(l => l.Index))})";
     }    
 }

@@ -1,6 +1,6 @@
 ﻿using O2DESNet.RCQueues.Interfaces;
 
-namespace O2DESNet.RCQueues.Common
+namespace O2DESNet.RCQueues
 {
 
     public struct ActivityQuantity

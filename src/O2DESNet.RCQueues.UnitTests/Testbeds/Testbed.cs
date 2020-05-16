@@ -15,14 +15,14 @@ namespace O2DESNet.RCQueues.UnitTests.Testbeds
         public class Statics : IAssets
         {
             public string Id { get; } = "";
-            public RCQsModel.Statics RCQueuesModel { get; set; }
+            public RCQueuesModel.Statics RCQueuesModel { get; set; }
             public PatternGenerator.Statics Generator { get; set; }
             public List<Activity> Activities { get; set; }
             public Dictionary<IResource, (TimeSpan MTTF, TimeSpan MTTR)> ResourceCycles { get; set; }
             public Statics() { }
             public Statics(SimpleRCQs.Statics simpleRCQs)
             {
-                RCQueuesModel = new RCQsModel.Statics(simpleRCQs.Resources, simpleRCQs.Activities);
+                RCQueuesModel = new RCQueuesModel.Statics(simpleRCQs.Resources, simpleRCQs.Activities);
                 Generator = simpleRCQs.Generator;
                 Activities = simpleRCQs.Activities;
             }
@@ -33,7 +33,7 @@ namespace O2DESNet.RCQueues.UnitTests.Testbeds
 
         #region Dynamics        
         internal int CountLoads { get; private set; } = 0;
-        internal RCQsModel RCQsModel { get; private set; }
+        internal RCQueuesModel RCQsModel { get; private set; }
         internal PatternGenerator Generator { get; private set; }
         internal Dictionary<Activity, Random> RS { get; private set; }
         #endregion
@@ -98,7 +98,7 @@ namespace O2DESNet.RCQueues.UnitTests.Testbeds
 
         public Testbed(Statics assets, int seed, string tag = null) : base(assets, seed, tag)
         {
-            RCQsModel = AddChild(new RCQsModel(Assets.RCQueuesModel, DefaultRS.Next()));
+            RCQsModel = AddChild(new RCQueuesModel(Assets.RCQueuesModel, DefaultRS.Next()));
             Generator = AddChild(new PatternGenerator(Assets.Generator, DefaultRS.Next()));
 
             Generator.OnArrive += Arrive;

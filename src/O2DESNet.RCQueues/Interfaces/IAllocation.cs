@@ -12,11 +12,11 @@ namespace O2DESNet.RCQueues.Interfaces
         /// <summary>
         /// Map requirement to list of resource-quantity tuples allocated for it
         /// </summary>
-        IReadOnlyDictionary<IRequirement, IReadOnlyList<ResourceQuantity>> Requirement_ResourceQuantityList { get; }
+        IReadOnlyDictionary<IRequirement, IReadOnlyList<ResourceQuantity>> RequirementResourceQuantityList { get; }
 
         /// <summary>
         /// Map resource to aggregated allocated quantity across all requirement
         /// </summary>
-        IReadOnlyDictionary<IResource, double> ResourceQuantity_Aggregated { get; }
+        IReadOnlyDictionary<IResource, double> ResourceQuantityAggregated { get; }
     }
 }

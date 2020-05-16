@@ -9,9 +9,9 @@ namespace O2DESNet.RCQueues
     {
         private readonly Allocation _allocation;
 
-        public IReadOnlyDictionary<IRequirement, IReadOnlyList<ResourceQuantity>> Requirement_ResourceQuantityList => _allocation.Requirement_ResourceQuantityList;
+        public IReadOnlyDictionary<IRequirement, IReadOnlyList<ResourceQuantity>> RequirementResourceQuantityList => _allocation.RequirementResourceQuantityList;
 
-        public IReadOnlyDictionary<IResource, double> ResourceQuantity_Aggregated => _allocation.ResourceQuantity_Aggregated;
+        public IReadOnlyDictionary<IResource, double> ResourceQuantityAggregated => _allocation.ResourceQuantityAggregated;
 
         internal ReadOnlyAllocation(Allocation allocation)
         {

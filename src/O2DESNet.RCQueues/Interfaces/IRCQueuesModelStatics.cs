@@ -2,7 +2,7 @@
 
 namespace O2DESNet.RCQueues.Interfaces
 {
-    public interface IRCQsModelStatics : IAssets
+    public interface IRCQueuesModelStatics : IAssets
     {
         IReadOnlyList<IResource> Resources { get; }
         IReadOnlyList<IActivity> Activities { get; }        

@@ -10,12 +10,12 @@ namespace O2DESNet.RCQueues
     {
         private ReadOnlyAllocation _readOnly = null;
 
-        public IReadOnlyDictionary<IRequirement, IReadOnlyList<ResourceQuantity>> Requirement_ResourceQuantityList => Rqmt_ResQttList_Dict.AsReadOnly();
+        public IReadOnlyDictionary<IRequirement, IReadOnlyList<ResourceQuantity>> RequirementResourceQuantityList => _rqmtResQttListDict.AsReadOnly();
 
-        private readonly Dictionary<IRequirement, List<ResourceQuantity>> Rqmt_ResQttList_Dict = new Dictionary<IRequirement, List<ResourceQuantity>>();
+        private readonly Dictionary<IRequirement, List<ResourceQuantity>> _rqmtResQttListDict = new Dictionary<IRequirement, List<ResourceQuantity>>();
 
-        public IReadOnlyDictionary<IResource, double> ResourceQuantity_Aggregated =>
-            Rqmt_ResQttList_Dict.Values.SelectMany(list => list).GroupBy(t => t.Resource)
+        public IReadOnlyDictionary<IResource, double> ResourceQuantityAggregated =>
+            _rqmtResQttListDict.Values.SelectMany(list => list).GroupBy(t => t.Resource)
                     .ToDictionary(g => g.Key, g => g.Sum(i => i.Quantity)).AsReadOnly(d => d);
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace O2DESNet.RCQueues
         /// </summary>
         public void Add(IRequirement key, IEnumerable<ResourceQuantity> value)
         {
-            Rqmt_ResQttList_Dict.Add(key, value.ToList());
+            _rqmtResQttListDict.Add(key, value.ToList());
         }
 
         public ReadOnlyAllocation AsReadOnly()

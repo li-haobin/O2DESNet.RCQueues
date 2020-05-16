@@ -121,7 +121,7 @@ namespace O2DESNet.RCQueues.UnitTests.Samples
 
             return new Testbed.Statics
             {
-                RCQueuesModel = new RCQsModel.Statics(resources, activities),
+                RCQueuesModel = new RCQueuesModel.Statics(resources, activities),
                 Generator = new PatternGenerator.Statics { MeanHourlyRate = 11 },
                 Activities = activities,
             };
