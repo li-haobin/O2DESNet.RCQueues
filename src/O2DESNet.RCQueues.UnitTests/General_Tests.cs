@@ -36,12 +36,12 @@ namespace O2DESNet.RCQueues.UnitTests
                 sim.Run(TimeSpan.FromDays(1));
                 var stats_activities = sim.RCQsModel.AllActivities.Select(act => new List<double>
                 {
-                    sim.RCQsModel.ActivityHcPending[act].AverageCount,
-                    sim.RCQsModel.ActivityHcActive[act].AverageCount,
-                    sim.RCQsModel.ActivityHcPassive[act].AverageCount,
-                    sim.RCQsModel.ActivityHcPending[act].AverageDuration.TotalHours,
-                    sim.RCQsModel.ActivityHcActive[act].AverageDuration.TotalHours,
-                    sim.RCQsModel.ActivityHcPassive[act].AverageDuration.TotalHours,
+                    sim.RCQsModel.ActivityHourCounterPending[act].AverageCount,
+                    sim.RCQsModel.ActivityHourCounterActive[act].AverageCount,
+                    sim.RCQsModel.ActivityHourCounterPassive[act].AverageCount,
+                    sim.RCQsModel.ActivityHourCounterPending[act].AverageDuration.TotalHours,
+                    sim.RCQsModel.ActivityHourCounterActive[act].AverageDuration.TotalHours,
+                    sim.RCQsModel.ActivityHourCounterPassive[act].AverageDuration.TotalHours,
                 }).ToList();
                 foreach (var d in stats_activities.SelectMany(l => l))
                     if (double.IsNaN(d) || d < 0) Assert.Fail();
@@ -63,9 +63,9 @@ namespace O2DESNet.RCQueues.UnitTests
                 sim.Run(TimeSpan.FromDays(1));
                 var stats_resources = sim.RCQsModel.Assets.Resources.Select(res => new List<double>
                 {
-                    sim.RCQsModel.ResourceHcPending[res].AverageCount,
-                    sim.RCQsModel.ResourceHcActive[res].AverageCount,
-                    sim.RCQsModel.ResourceHcPassive[res].AverageCount,
+                    sim.RCQsModel.ResourceHourCounterPending[res].AverageCount,
+                    sim.RCQsModel.ResourceHourCounterActive[res].AverageCount,
+                    sim.RCQsModel.ResourceHourCounterPassive[res].AverageCount,
                 }).ToList();
                 foreach (var d in stats_resources.SelectMany(l => l))
                     if (double.IsNaN(d) || d < 0) Assert.Fail();
