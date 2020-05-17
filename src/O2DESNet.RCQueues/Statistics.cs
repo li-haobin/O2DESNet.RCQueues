@@ -1,4 +1,6 @@
-﻿using System;
+﻿using O2DESNet.RCQueues.Common;
+
+using System;
 using System.IO;
 using System.Linq;
 
@@ -21,15 +23,15 @@ namespace O2DESNet.RCQueues
                 foreach (var act in rcq.AllActivities)
                 {
                     sw.Write("{0},", act.Name);
-                    sw.Write("{0},", rcq.ActivityHcPending[act].AverageCount);
-                    sw.Write("{0},", rcq.ActivityHcActive[act].AverageCount);
-                    sw.Write("{0},", rcq.ActivityHcPassive[act].AverageCount);
-                    sw.Write("{0},", rcq.ActivityHcPending[act].AverageDuration.TotalHours);
-                    sw.Write("{0},", rcq.ActivityHcActive[act].AverageDuration.TotalHours);
-                    sw.Write("{0},", rcq.ActivityHcPassive[act].AverageDuration.TotalHours);
-                    sw.Write("{0},", rcq.ActivityHcActive[act].TotalIncrement);
-                    sw.Write("{0},", rcq.ActivityHcActive[act].TotalIncrement - rcq.ActivityHcPassive[act].TotalDecrement);
-                    sw.Write("{0},", rcq.ActivityHcPassive[act].TotalDecrement);
+                    sw.Write("{0},", rcq.ActivitiesHourCounter[OutputType.Pending][act].AverageCount);
+                    sw.Write("{0},", rcq.ActivitiesHourCounter[OutputType.Active][act].AverageCount);
+                    sw.Write("{0},", rcq.ActivitiesHourCounter[OutputType.Passive][act].AverageCount);
+                    sw.Write("{0},", rcq.ActivitiesHourCounter[OutputType.Pending][act].AverageDuration.TotalHours);
+                    sw.Write("{0},", rcq.ActivitiesHourCounter[OutputType.Active][act].AverageDuration.TotalHours);
+                    sw.Write("{0},", rcq.ActivitiesHourCounter[OutputType.Passive][act].AverageDuration.TotalHours);
+                    sw.Write("{0},", rcq.ActivitiesHourCounter[OutputType.Active][act].TotalIncrement);
+                    sw.Write("{0},", rcq.ActivitiesHourCounter[OutputType.Active][act].TotalIncrement - rcq.ActivitiesHourCounter[OutputType.Passive][act].TotalDecrement);
+                    sw.Write("{0},", rcq.ActivitiesHourCounter[OutputType.Passive][act].TotalDecrement);
                     sw.WriteLine();
                 }
             }
@@ -44,12 +46,12 @@ namespace O2DESNet.RCQueues
 
                     sw.Write("{0},", res.Name);
                     sw.Write("{0},", res.Capacity);
-                    sw.Write("{0},", rcq.ResourceHcAvailable[res].AverageCount);
-                    sw.Write("{0},", rcq.ResourceHcPending[res].AverageCount);
-                    sw.Write("{0},", rcq.ResourceHcActive[res].AverageCount);
-                    sw.Write("{0},", rcq.ResourceHcPassive[res].AverageCount);
-                    sw.Write("{0},", (rcq.ResourceHcActive[res].AverageCount + rcq.ResourceHcPassive[res].AverageCount)
-                        / rcq.ResourceHcAvailable[res].AverageCount);
+                    sw.Write("{0},", rcq.ResourceHourCounterAvailable[res].AverageCount);
+                    sw.Write("{0},", rcq.ResourceHourCounterPending[res].AverageCount);
+                    sw.Write("{0},", rcq.ResourceHourCounterActive[res].AverageCount);
+                    sw.Write("{0},", rcq.ResourceHourCounterPassive[res].AverageCount);
+                    sw.Write("{0},", (rcq.ResourceHourCounterActive[res].AverageCount + rcq.ResourceHourCounterPassive[res].AverageCount)
+                        / rcq.ResourceHourCounterAvailable[res].AverageCount);
                     sw.WriteLine();
                     if (rcq.Assets.Activities.Count > 0)
                     {
@@ -58,13 +60,13 @@ namespace O2DESNet.RCQueues
                         {
                             sw.Write("{0},", act.Id);
                             sw.Write("{0},", res.Capacity);
-                            sw.Write("{0},", rcq.ResourceHcAvailable[res].AverageCount);
-                            sw.Write("{0},", rcq.ResourceActivityHcPending[res][act].AverageCount);
-                            sw.Write("{0},", rcq.ResourceActivityHcActive[res][act].AverageCount);
-                            sw.Write("{0},", rcq.ResourceActivityHcPassive[res][act].AverageCount);
-                            sw.Write("{0},", (rcq.ResourceActivityHcActive[res][act].AverageCount 
-                                + rcq.ResourceActivityHcPassive[res][act].AverageCount)
-                                / rcq.ResourceHcAvailable[res].AverageCount);
+                            sw.Write("{0},", rcq.ResourceHourCounterAvailable[res].AverageCount);
+                            sw.Write("{0},", rcq.ResourceActivityHourCounterPending[res][act].AverageCount);
+                            sw.Write("{0},", rcq.ResourceActivityHourCounterActive[res][act].AverageCount);
+                            sw.Write("{0},", rcq.ResourceActivityHourCounterPassive[res][act].AverageCount);
+                            sw.Write("{0},", (rcq.ResourceActivityHourCounterActive[res][act].AverageCount 
+                                + rcq.ResourceActivityHourCounterPassive[res][act].AverageCount)
+                                / rcq.ResourceHourCounterAvailable[res].AverageCount);
                             sw.WriteLine();
                         }
                         sw.WriteLine();

@@ -5,7 +5,7 @@ namespace O2DESNet.RCQueues.Common
     /// <summary>
     /// Batch Phase Enumeration
     /// </summary>
-    [DefaultValue(BatchPhase.Batching)]
+    [DefaultValue(Batching)]
     public enum BatchPhase : int
     {
         /// <summary>
@@ -46,5 +46,19 @@ namespace O2DESNet.RCQueues.Common
         /// </summary>
         [Description("Activity disposed")]
         Disposed,
+    }
+
+    [DefaultValue(None)]
+    public enum OutputType : int
+    {
+        None,
+        Pending,
+        Active,
+        Passive,
+        Occupied,
+        Available,
+        DynamicCapacity,
+        PendingLockActive,
+        PendingLockPassive
     }
 }

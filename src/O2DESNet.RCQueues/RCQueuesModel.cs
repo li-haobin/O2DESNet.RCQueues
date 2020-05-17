@@ -140,17 +140,17 @@ namespace O2DESNet.RCQueues
 
         public IReadOnlyDictionary<IResource, double> ResourceQuantityOccupied
         {
-            get { return Assets.Resources.ToReadOnlyDictionary(r => r, r => ResourceHcOccupied[r].LastCount); }
+            get { return Assets.Resources.ToReadOnlyDictionary(r => r, r => ResourceHourCounterOccupied[r].LastCount); }
         }
 
         public IReadOnlyDictionary<IResource, double> ResourceQuantityAvailable
         {
-            get { return Assets.Resources.ToReadOnlyDictionary(r => r, r => ResourceHcAvailable[r].LastCount); }
+            get { return Assets.Resources.ToReadOnlyDictionary(r => r, r => ResourceHourCounterAvailable[r].LastCount); }
         }
 
         public IReadOnlyDictionary<IResource, double> ResourceQuantityDynamicCapacity
         {
-            get { return Assets.Resources.ToReadOnlyDictionary(r => r, r => ResourceHcDynamicCapacity[r].LastCount); }
+            get { return Assets.Resources.ToReadOnlyDictionary(r => r, r => ResourceHourCounterDynamicCapacity[r].LastCount); }
         }
 
         public IReadOnlyDictionary<IResource, double> ResourceQuantityPendingLock => _resourceQuantityPendingLock.AsReadOnly();
@@ -164,108 +164,121 @@ namespace O2DESNet.RCQueues
         public int CountOfLoadsProcessing => _allLoads.Count(load => _stageIndices[load] > 0);
         public int CountOfLoadsExited => CountOfLoadsEntered - CountOfLoadsProcessing;
 
-        private readonly Dictionary<IActivity, HourCounter> _activityHcPending;
-        private readonly Dictionary<IActivity, HourCounter> _activityHcActive;
-        private readonly Dictionary<IActivity, HourCounter> _activityHcPassive;
-        private readonly Dictionary<IResource, HourCounter> _resourceHcPending;
-        private readonly Dictionary<IResource, HourCounter> _resourceHcActive;
-        private readonly Dictionary<IResource, HourCounter> _resourceHcPassive;
-        private readonly Dictionary<IResource, HourCounter> _resourceHcOccupied;
-        private readonly Dictionary<IResource, HourCounter> _resourceHcAvailable;
-        private readonly Dictionary<IResource, HourCounter> _resourceHcDynamicCapacity;
-        private readonly Dictionary<IResource, HourCounter> _resourceHcPendingLockActive;
-        private readonly Dictionary<IResource, HourCounter> _resourceHcPendingLockPassive;
+        private readonly Dictionary<OutputType, Dictionary<IActivity, HourCounter>> _activitiesHourCounter;
 
+        //private readonly Dictionary<IActivity, HourCounter> _activityHourCounterPending;
+        //private readonly Dictionary<IActivity, HourCounter> _activityHourCounterActive;
+        //private readonly Dictionary<IActivity, HourCounter> _activityHourCounterPassive;
 
-        public IReadOnlyDictionary<IActivity, ReadOnlyHourCounter> ActivityHcPending => _activityHcPending.AsReadOnly(hc => hc.AsReadOnly());
-        
-        public IReadOnlyDictionary<IActivity, ReadOnlyHourCounter> ActivityHcActive => _activityHcActive.AsReadOnly(hc => hc.AsReadOnly());
-        
-        public IReadOnlyDictionary<IActivity, ReadOnlyHourCounter> ActivityHcPassive => _activityHcPassive.AsReadOnly(hc => hc.AsReadOnly());
-        
-        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcPending
+        private readonly Dictionary<IResource, HourCounter> _resourceHourCounterPending;
+        private readonly Dictionary<IResource, HourCounter> _resourceHourCounterActive;
+        private readonly Dictionary<IResource, HourCounter> _resourceHourCounterPassive;
+        private readonly Dictionary<IResource, HourCounter> _resourceHourCounterOccupied;
+        private readonly Dictionary<IResource, HourCounter> _resourceHourCounterAvailable;
+        private readonly Dictionary<IResource, HourCounter> _resourceHourCounterDynamicCapacity;
+        private readonly Dictionary<IResource, HourCounter> _resourceHourCounterPendingLockActive;
+        private readonly Dictionary<IResource, HourCounter> _resourceHourCounterPendingLockPassive;
+
+        private readonly Dictionary<IResource, Dictionary<IActivity, HourCounter>> _resourceActivityHourCounterPending;
+        private readonly Dictionary<IResource, Dictionary<IActivity, HourCounter>> _resourceActivityHourCounterActive;
+        private readonly Dictionary<IResource, Dictionary<IActivity, HourCounter>> _resourceActivityHourCounterPassive;
+        private readonly Dictionary<IResource, Dictionary<IActivity, HourCounter>> _resourceActivityHourCounterOccupied;
+
+        public IReadOnlyDictionary<OutputType, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ActivitiesHourCounter
         {
-            get { return _resourceHcPending.AsReadOnly(hc => hc.AsReadOnly()); }
-        }
-        
-        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcActive
-        {
-            get { return _resourceHcActive.AsReadOnly(hc => hc.AsReadOnly()); }
-        }
-        
-        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcPassive
-        {
-            get { return _resourceHcPassive.AsReadOnly(hc => hc.AsReadOnly()); }
-        }
-        
-        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcOccupied
-        {
-            get { return _resourceHcOccupied.AsReadOnly(hc => hc.AsReadOnly()); }
-        }
-        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcAvailable
-        {
-            get { return _resourceHcAvailable.AsReadOnly(hc => hc.AsReadOnly()); }
+            get
+            {
+                var temp = new Dictionary<OutputType, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>>
+                {
+                    { OutputType.Pending, _activitiesHourCounter[OutputType.Pending].AsReadOnly(hc => hc.AsReadOnly()) },
+                    { OutputType.Active, _activitiesHourCounter[OutputType.Active].AsReadOnly(hc => hc.AsReadOnly()) },
+                    { OutputType.Passive, _activitiesHourCounter[OutputType.Passive].AsReadOnly(hc => hc.AsReadOnly()) },
+                };
+
+                return temp;
+            }
         }
 
-        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcDynamicCapacity
+        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHourCounterPending
         {
-            get { return _resourceHcDynamicCapacity.AsReadOnly(hc => hc.AsReadOnly()); }
-        }
-        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcPendingLockActive
-        {
-            get { return _resourceHcPendingLockActive.AsReadOnly(hc => hc.AsReadOnly()); }
+            get { return _resourceHourCounterPending.AsReadOnly(hc => hc.AsReadOnly()); }
         }
 
-        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcPendingLockPassive
+        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHourCounterActive
         {
-            get { return _resourceHcPendingLockPassive.AsReadOnly(hc => hc.AsReadOnly()); }
+            get { return _resourceHourCounterActive.AsReadOnly(hc => hc.AsReadOnly()); }
         }
 
-        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHcPending
+        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHourCounterPassive
+        {
+            get { return _resourceHourCounterPassive.AsReadOnly(hc => hc.AsReadOnly()); }
+        }
+
+        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHourCounterOccupied
+        {
+            get { return _resourceHourCounterOccupied.AsReadOnly(hc => hc.AsReadOnly()); }
+        }
+
+        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHourCounterAvailable
+        {
+            get { return _resourceHourCounterAvailable.AsReadOnly(hc => hc.AsReadOnly()); }
+        }
+
+        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHourCounterDynamicCapacity
+        {
+            get { return _resourceHourCounterDynamicCapacity.AsReadOnly(hc => hc.AsReadOnly()); }
+        }
+
+        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHourCounterPendingLockActive
+        {
+            get { return _resourceHourCounterPendingLockActive.AsReadOnly(hc => hc.AsReadOnly()); }
+        }
+
+        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHourCounterPendingLockPassive
+        {
+            get { return _resourceHourCounterPendingLockPassive.AsReadOnly(hc => hc.AsReadOnly()); }
+        }
+
+        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHourCounterPending
         {
             get
             {
                 return _resourceToActivities.OrderBy(i => i.Key.Id)
                     .ToDictionary(i => i.Key, i => i.Value.OrderBy(j => j.Name)
-                    .ToDictionary(act => act, act => _resourceActivityHcPending[i.Key][act]))
+                    .ToDictionary(act => act, act => _resourceActivityHourCounterPending[i.Key][act]))
                     .AsReadOnly(d => d.AsReadOnly(hc => hc.AsReadOnly()));
             }
         }
 
-        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHcActive
+        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHourCounterActive
         {
             get
             {
                 return _resourceToActivities.OrderBy(i => i.Key.Id)
                     .ToDictionary(i => i.Key, i => i.Value.OrderBy(j => j.Name)
-                    .ToDictionary(act => act, act => _resourceActivityHcActive[i.Key][act]))
+                    .ToDictionary(act => act, act => _resourceActivityHourCounterActive[i.Key][act]))
                     .AsReadOnly(d => d.AsReadOnly(hc => hc.AsReadOnly()));
             }
         }
 
-        private readonly Dictionary<IResource, Dictionary<IActivity, HourCounter>> _resourceActivityHcPending;
-        private readonly Dictionary<IResource, Dictionary<IActivity, HourCounter>> _resourceActivityHcActive;
-        private readonly Dictionary<IResource, Dictionary<IActivity, HourCounter>> _resourceActivityHcPassive;
-        private readonly Dictionary<IResource, Dictionary<IActivity, HourCounter>> _resourceActivityHcOccupied;
-
-        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHcPassive
+        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHourCounterPassive
         {
             get
             {
                 return _resourceToActivities.OrderBy(i => i.Key.Id)
                     .ToDictionary(i => i.Key, i => i.Value.OrderBy(j => j.Name)
-                    .ToDictionary(act => act, act => _resourceActivityHcPassive[i.Key][act]))
+                    .ToDictionary(act => act, act => _resourceActivityHourCounterPassive[i.Key][act]))
                     .AsReadOnly(d => d.AsReadOnly(hc => hc.AsReadOnly()));
             }
         }
 
-        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHcOccupied
+        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHourCounterOccupied
         {
             get
             {
                 return _resourceToActivities.OrderBy(i => i.Key.Id)
                     .ToDictionary(i => i.Key, i => i.Value.OrderBy(j => j.Name)
-                    .ToDictionary(act => act, act => _resourceActivityHcOccupied[i.Key][act]))
+                    .ToDictionary(act => act, act => _resourceActivityHourCounterOccupied[i.Key][act]))
                     .AsReadOnly(d => d.AsReadOnly(hc => hc.AsReadOnly()));
             }
         }
@@ -280,8 +293,8 @@ namespace O2DESNet.RCQueues
         /// </summary>
         private double RemainingCapcity(IResource res, Batch toMove)
         {
-            var available = _resourceHcAvailable[res].LastCount;
-            var remaining = available - _resourceHcOccupied[res].LastCount;
+            var available = _resourceHourCounterAvailable[res].LastCount;
+            var remaining = available - _resourceHourCounterOccupied[res].LastCount;
             foreach (var curr in toMove.Select(load => _loadToBatchCurrent[load]).Distinct())
             {
                 if (curr != null && curr.IsSubsetOf(toMove) && _batchToAllocation[curr].ResourceQuantityAggregated.ContainsKey(res))
@@ -368,12 +381,12 @@ namespace O2DESNet.RCQueues
                         released[res] += qtt;
 
                         _resourceBatchQuantityPassive[res].Remove(curr);
-                        _resourceHcPassive[res].ObserveChange(-qtt);
-                        _resourceHcOccupied[res].ObserveChange(-qtt);
+                        _resourceHourCounterPassive[res].ObserveChange(-qtt);
+                        _resourceHourCounterOccupied[res].ObserveChange(-qtt);
                         if (_activitiesToTrace.Contains(act))
                         {
-                            _resourceActivityHcPassive[res][act].ObserveChange(-qtt);
-                            _resourceActivityHcOccupied[res][act].ObserveChange(-qtt);
+                            _resourceActivityHourCounterPassive[res][act].ObserveChange(-qtt);
+                            _resourceActivityHourCounterOccupied[res][act].ObserveChange(-qtt);
                         }
                     }
                     #endregion
@@ -401,9 +414,9 @@ namespace O2DESNet.RCQueues
                 .Requirements.Where(req => req.Pool.Contains(res)).Sum(req => req.Quantity)))
                 .GroupBy(t => t.Item1).ToDictionary(g => g.Key, g => g.Sum(t => t.Item2));
 
-            foreach (var act in _resourceActivityHcPending[res].Keys)
-                _resourceActivityHcPending[res][act].ObserveCount(qtts.ContainsKey(act) ? qtts[act] : 0);
-            _resourceHcPending[res].ObserveCount(qtts.Values.Sum());
+            foreach (var act in _resourceActivityHourCounterPending[res].Keys)
+                _resourceActivityHourCounterPending[res][act].ObserveCount(qtts.ContainsKey(act) ? qtts[act] : 0);
+            _resourceHourCounterPending[res].ObserveCount(qtts.Values.Sum());
         }
 
         /// <summary>
@@ -544,10 +557,12 @@ namespace O2DESNet.RCQueues
                 {
                     if (moveTo.Phase == BatchPhase.Pending)
                     {
-                        _activityHcPending[moveTo.Activity].ObserveChange(-moveTo.Count);
+                        _activitiesHourCounter[OutputType.Pending][moveTo.Activity].ObserveChange(-moveTo.Count);
                         foreach (var load in moveTo) _activityToLoadsPending[moveTo.Activity].Remove(load);
                     }
-                    _activityHcActive[moveTo.Activity].ObserveChange(moveTo.Count);
+
+                    _activitiesHourCounter[OutputType.Passive][moveTo.Activity].ObserveChange(moveTo.Count);
+
                     foreach (var load in moveTo) _activityToLoadsActive[moveTo.Activity].Add(load);
                 }
 
@@ -556,7 +571,7 @@ namespace O2DESNet.RCQueues
                     var curr = _loadToBatchCurrent[load];
                     if (curr != null && _activitiesToTrace.Contains(curr.Activity))
                     {
-                        _activityHcPassive[curr.Activity].ObserveChange(-1);
+                        _activitiesHourCounter[OutputType.Passive][curr.Activity].ObserveChange(-1);
                         _activityToLoadsPassive[curr.Activity].Remove(load);
                     }
                 }
@@ -567,12 +582,12 @@ namespace O2DESNet.RCQueues
                     var act = moveTo.Activity;
                     var qtt = i.Value;
                     _resourceBatchQuantityActive[res].Add(moveTo, qtt);
-                    _resourceHcActive[res].ObserveChange(qtt);
-                    _resourceHcOccupied[res].ObserveChange(qtt);
+                    _resourceHourCounterActive[res].ObserveChange(qtt);
+                    _resourceHourCounterOccupied[res].ObserveChange(qtt);
                     if (_activitiesToTrace.Contains(act))
                     {
-                        _resourceActivityHcActive[res][act].ObserveChange(qtt);
-                        _resourceActivityHcOccupied[res][act].ObserveChange(qtt);
+                        _resourceActivityHourCounterActive[res][act].ObserveChange(qtt);
+                        _resourceActivityHourCounterOccupied[res][act].ObserveChange(qtt);
                     }
                 }
 
@@ -637,7 +652,7 @@ namespace O2DESNet.RCQueues
                     }
                     if (_activitiesToTrace.Contains(moveTo.Activity))
                     {
-                        _activityHcPending[moveTo.Activity].ObserveChange(moveTo.Count);
+                        _activitiesHourCounter[OutputType.Pending][moveTo.Activity].ObserveChange(moveTo.Count);
                         foreach (var load in moveTo) _activityToLoadsPending[moveTo.Activity].Add(load);
                     }
                 }
@@ -658,8 +673,9 @@ namespace O2DESNet.RCQueues
             /// Statistics                
             if (_activitiesToTrace.Contains(batch.Activity))
             {
-                _activityHcActive[batch.Activity].ObserveChange(-batch.Count);
-                _activityHcPassive[batch.Activity].ObserveChange(batch.Count);
+                _activitiesHourCounter[OutputType.Active][batch.Activity].ObserveChange(-batch.Count);
+                _activitiesHourCounter[OutputType.Passive][batch.Activity].ObserveChange(batch.Count);
+
                 foreach (var load in batch)
                 {
                     _activityToLoadsActive[batch.Activity].Remove(load);
@@ -673,12 +689,12 @@ namespace O2DESNet.RCQueues
                 var qtt = i.Value;
                 _resourceBatchQuantityActive[res].Remove(batch);
                 _resourceBatchQuantityPassive[res].Add(batch, qtt);
-                _resourceHcActive[res].ObserveChange(-qtt);
-                _resourceHcPassive[res].ObserveChange(qtt);
+                _resourceHourCounterActive[res].ObserveChange(-qtt);
+                _resourceHourCounterPassive[res].ObserveChange(qtt);
                 if (_activitiesToTrace.Contains(act))
                 {
-                    _resourceActivityHcActive[res][act].ObserveChange(-qtt);
-                    _resourceActivityHcPassive[res][act].ObserveChange(qtt);
+                    _resourceActivityHourCounterActive[res][act].ObserveChange(-qtt);
+                    _resourceActivityHourCounterPassive[res][act].ObserveChange(qtt);
                 }
                 if (ResourceQuantityPendingLock[res] > 0) UpdateHourCounter_ResourcePendingLock(res);
             }
@@ -718,7 +734,7 @@ namespace O2DESNet.RCQueues
             _loadToBatchMovingTo.Remove(load);
             if (_activitiesToTrace.Contains(curr.Activity))
             {
-                _activityHcPassive[curr.Activity].ObserveChange(-1);
+                _activitiesHourCounter[OutputType.Passive][curr.Activity].ObserveChange(-1);
                 _activityToLoadsPassive[curr.Activity].Remove(load);
             }
             DisposeIfEmpty(curr);
@@ -736,9 +752,9 @@ namespace O2DESNet.RCQueues
             Log("RqstLock", resource, quantity);
             _resourceQuantityPendingLock[resource] = Math.Min(
                 _resourceQuantityPendingLock[resource] + quantity,
-                _resourceHcAvailable[resource].LastCount);
-            _resourceHcDynamicCapacity[resource].ObserveCount(
-                Math.Max(0, _resourceHcDynamicCapacity[resource].LastCount - quantity));
+                _resourceHourCounterAvailable[resource].LastCount);
+            _resourceHourCounterDynamicCapacity[resource].ObserveCount(
+                Math.Max(0, _resourceHourCounterDynamicCapacity[resource].LastCount - quantity));
             AttemptToLock(resource);
         }
 
@@ -749,9 +765,9 @@ namespace O2DESNet.RCQueues
             var removeFromPending = Math.Min(_resourceQuantityPendingLock[resource], qtt);
             _resourceQuantityPendingLock[resource] -= removeFromPending;
             qtt -= removeFromPending;
-            _resourceHcAvailable[resource].ObserveChange(qtt);
-            _resourceHcDynamicCapacity[resource].ObserveCount(
-                _resourceHcDynamicCapacity[resource].LastCount + quantity);
+            _resourceHourCounterAvailable[resource].ObserveChange(qtt);
+            _resourceHourCounterDynamicCapacity[resource].ObserveCount(
+                _resourceHourCounterDynamicCapacity[resource].LastCount + quantity);
             UpdateHourCounter_ResourcePendingLock(resource);
             RecallForPending(new List<IResource> { resource }); /// changing from passive pending to unlocked shall also trigger starting of new activities
             if (qtt > 0)
@@ -768,9 +784,9 @@ namespace O2DESNet.RCQueues
         {
             Log("AtmptLock", resource);
             var quantity = Math.Min(
-                _resourceHcAvailable[resource].LastCount - _resourceHcOccupied[resource].LastCount,
+                _resourceHourCounterAvailable[resource].LastCount - _resourceHourCounterOccupied[resource].LastCount,
                 _resourceQuantityPendingLock[resource]);
-            _resourceHcAvailable[resource].ObserveChange(-quantity);
+            _resourceHourCounterAvailable[resource].ObserveChange(-quantity);
             _resourceQuantityPendingLock[resource] -= quantity;
             UpdateHourCounter_ResourcePendingLock(resource);
             if (quantity > 0)
@@ -785,12 +801,12 @@ namespace O2DESNet.RCQueues
         {
             var pendingLockActive = Math.Min(
                 _resourceQuantityPendingLock[resource],
-                _resourceHcActive[resource].LastCount);
+                _resourceHourCounterActive[resource].LastCount);
             /// Remark: the active occupied resource has higher priority to be counted as it is more likely to be released and locked
             var pendingLockPassive = _resourceQuantityPendingLock[resource] - pendingLockActive;
 
-            _resourceHcPendingLockActive[resource].ObserveCount(pendingLockActive);
-            _resourceHcPendingLockPassive[resource].ObserveCount(pendingLockPassive);
+            _resourceHourCounterPendingLockActive[resource].ObserveCount(pendingLockActive);
+            _resourceHourCounterPendingLockPassive[resource].ObserveCount(pendingLockPassive);
         }
         #endregion
 
@@ -817,45 +833,52 @@ namespace O2DESNet.RCQueues
             _activityToBatchTimesPending = new Dictionary<IActivity, List<(Batch Batch, DateTime Time)>>();
             _activityToBatchesBatching = new Dictionary<IActivity, List<Batch>>();
 
-            _activityHcActive = new Dictionary<IActivity, HourCounter>();
-            _activityHcPassive = new Dictionary<IActivity, HourCounter>();
-            _activityHcPending = new Dictionary<IActivity, HourCounter>();
-            _resourceHcActive = Assets.Resources.ToDictionary(r => r, r => AddHourCounter());
-            _resourceHcAvailable = Assets.Resources.ToDictionary(r => r, r =>
+            //_activityHourCounterActive = new Dictionary<IActivity, HourCounter>();
+            //_activityHourCounterPassive = new Dictionary<IActivity, HourCounter>();
+            //_activityHourCounterPending = new Dictionary<IActivity, HourCounter>();
+            _resourceHourCounterActive = Assets.Resources.ToDictionary(r => r, r => AddHourCounter());
+            _resourceHourCounterAvailable = Assets.Resources.ToDictionary(r => r, r =>
             {
                 var hc = AddHourCounter();
                 hc.ObserveCount(r.Capacity);
                 return hc;
             });
-            _resourceHcDynamicCapacity = Assets.Resources.ToDictionary(r => r, r =>
+            _resourceHourCounterDynamicCapacity = Assets.Resources.ToDictionary(r => r, r =>
             {
                 var hc = AddHourCounter();
                 hc.ObserveCount(r.Capacity);
                 return hc;
             });
-            _resourceHcOccupied = Assets.Resources.ToDictionary(r => r, r => AddHourCounter());
-            _resourceHcPassive = Assets.Resources.ToDictionary(r => r, r => AddHourCounter());
-            _resourceHcPending = Assets.Resources.ToDictionary(r => r, r => AddHourCounter());
-            _resourceHcPendingLockActive = Assets.Resources.ToDictionary(r => r, r => AddHourCounter());
-            _resourceHcPendingLockPassive = Assets.Resources.ToDictionary(r => r, r => AddHourCounter());
-            _resourceActivityHcPending = Assets.Resources.ToDictionary(r => r, r => new Dictionary<IActivity, HourCounter>());
-            _resourceActivityHcActive = Assets.Resources.ToDictionary(r => r, r => new Dictionary<IActivity, HourCounter>());
-            _resourceActivityHcPassive = Assets.Resources.ToDictionary(r => r, r => new Dictionary<IActivity, HourCounter>());
-            _resourceActivityHcOccupied = Assets.Resources.ToDictionary(r => r, r => new Dictionary<IActivity, HourCounter>());
+            _resourceHourCounterOccupied = Assets.Resources.ToDictionary(r => r, r => AddHourCounter());
+            _resourceHourCounterPassive = Assets.Resources.ToDictionary(r => r, r => AddHourCounter());
+            _resourceHourCounterPending = Assets.Resources.ToDictionary(r => r, r => AddHourCounter());
+            _resourceHourCounterPendingLockActive = Assets.Resources.ToDictionary(r => r, r => AddHourCounter());
+            _resourceHourCounterPendingLockPassive = Assets.Resources.ToDictionary(r => r, r => AddHourCounter());
+            _resourceActivityHourCounterPending = Assets.Resources.ToDictionary(r => r, r => new Dictionary<IActivity, HourCounter>());
+            _resourceActivityHourCounterActive = Assets.Resources.ToDictionary(r => r, r => new Dictionary<IActivity, HourCounter>());
+            _resourceActivityHourCounterPassive = Assets.Resources.ToDictionary(r => r, r => new Dictionary<IActivity, HourCounter>());
+            _resourceActivityHourCounterOccupied = Assets.Resources.ToDictionary(r => r, r => new Dictionary<IActivity, HourCounter>());
+
+            _activitiesHourCounter = new Dictionary<OutputType, Dictionary<IActivity, HourCounter>>();
+            _activitiesHourCounter.Add(OutputType.Pending, new Dictionary<IActivity, HourCounter>());
+            _activitiesHourCounter.Add(OutputType.Active, new Dictionary<IActivity, HourCounter>());
+            _activitiesHourCounter.Add(OutputType.Passive, new Dictionary<IActivity, HourCounter>());
 
             foreach (var act in Assets.Activities)
             {
                 _activitiesToTrace.Add(act);
                 foreach (var res in Assets.Resources)
                 {
-                    _resourceActivityHcPending[res].Add(act, AddHourCounter());
-                    _resourceActivityHcActive[res].Add(act, AddHourCounter());
-                    _resourceActivityHcPassive[res].Add(act, AddHourCounter());
-                    _resourceActivityHcOccupied[res].Add(act, AddHourCounter());
+                    _resourceActivityHourCounterPending[res].Add(act, AddHourCounter());
+                    _resourceActivityHourCounterActive[res].Add(act, AddHourCounter());
+                    _resourceActivityHourCounterPassive[res].Add(act, AddHourCounter());
+                    _resourceActivityHourCounterOccupied[res].Add(act, AddHourCounter());
                 }
-                _activityHcPending.Add(act, AddHourCounter(keepHistory: true));
-                _activityHcActive.Add(act, AddHourCounter(keepHistory: true));
-                _activityHcPassive.Add(act, AddHourCounter(keepHistory: true));
+
+                _activitiesHourCounter[OutputType.Pending].Add(act, AddHourCounter(keepHistory: true));
+                _activitiesHourCounter[OutputType.Active].Add(act, AddHourCounter(keepHistory: true));
+                _activitiesHourCounter[OutputType.Passive].Add(act, AddHourCounter(keepHistory: true));
+
                 _activityToLoadsPending.Add(act, new HashSet<ILoad>());
                 _activityToLoadsActive.Add(act, new HashSet<ILoad>());
                 _activityToLoadsPassive.Add(act, new HashSet<ILoad>());
@@ -898,6 +921,8 @@ namespace O2DESNet.RCQueues
 
         public override void Dispose()
         {
+            base.Dispose();
+
             foreach (Action<ILoad, IActivity> i in OnEntered.GetInvocationList()) OnEntered -= i;
             foreach (Action<ILoad> i in OnReadyToExit.GetInvocationList()) OnReadyToExit -= i;
             foreach (Action<IResource, double> i in OnLocked.GetInvocationList()) OnLocked -= i;
