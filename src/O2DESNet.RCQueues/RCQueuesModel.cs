@@ -6,6 +6,7 @@ using O2DESNet.Standard;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace O2DESNet.RCQueues
 {
@@ -42,16 +43,13 @@ namespace O2DESNet.RCQueues
         public IReadOnlyList<ILoad> LoadsReadyToExit => _loadsReadyToExit.ToList().AsReadOnly();
         private readonly HashSet<ILoad> _loadsReadyToExit = new HashSet<ILoad>();
 
-        public IReadOnlyDictionary<ILoad, IBatch> LoadToBatchCurrent { get { return _loadToBatchCurrent.AsReadOnly(b => (IBatch)b); } }
+        public IReadOnlyDictionary<ILoad, IBatch> LoadToBatchCurrent => _loadToBatchCurrent.AsReadOnly(b => (IBatch)b);
         private readonly Dictionary<ILoad, Batch> _loadToBatchCurrent = new Dictionary<ILoad, Batch>();
 
         public IReadOnlyDictionary<ILoad, IBatch> LoadToBatchMovingTo => _loadToBatchMovingTo.AsReadOnly();
         private readonly Dictionary<ILoad, IBatch> _loadToBatchMovingTo = new Dictionary<ILoad, IBatch>();
 
-        public IReadOnlyDictionary<IBatch, ReadOnlyAllocation> BatchToAllocation
-        {
-            get { return _batchToAllocation.AsReadOnly(a => a.AsReadOnly()); }
-        }
+        public IReadOnlyDictionary<IBatch, ReadOnlyAllocation> BatchToAllocation => _batchToAllocation.AsReadOnly(a => a.AsReadOnly());
         private readonly Dictionary<IBatch, Allocation> _batchToAllocation = new Dictionary<IBatch, Allocation>();
 
         /// <summary>
@@ -69,46 +67,22 @@ namespace O2DESNet.RCQueues
         public IReadOnlyDictionary<IActivity, IReadOnlyList<ILoad>> ActivityToLoads => _activityToLoads.AsReadOnly();
         private readonly Dictionary<IActivity, HashSet<ILoad>> _activityToLoads;
 
-        public IReadOnlyDictionary<IActivity, IReadOnlyList<ILoad>> ActivityToLoadsPending
-        {
-            get
-            {
-                return _activityToLoadsPending.OrderBy(i => i.Key.Id)
+        public IReadOnlyDictionary<IActivity, IReadOnlyList<ILoad>> ActivityToLoadsPending => _activityToLoadsPending.OrderBy(i => i.Key.Id)
                     .ToDictionary(i => i.Key, i => i.Value).AsReadOnly();
-            }
-        }
         private readonly Dictionary<IActivity, HashSet<ILoad>> _activityToLoadsPending;
 
-        public IReadOnlyDictionary<IActivity, IReadOnlyList<ILoad>> ActivityToLoadsActive
-        {
-            get
-            {
-                return _activityToLoadsActive.OrderBy(i => i.Key.Id)
+        public IReadOnlyDictionary<IActivity, IReadOnlyList<ILoad>> ActivityToLoadsActive => _activityToLoadsActive.OrderBy(i => i.Key.Id)
                     .ToDictionary(i => i.Key, i => i.Value).AsReadOnly();
-            }
-        }
         private readonly Dictionary<IActivity, HashSet<ILoad>> _activityToLoadsActive;
 
-        public IReadOnlyDictionary<IActivity, IReadOnlyList<ILoad>> ActivityToLoadsPassive
-        {
-            get
-            {
-                return _activityToLoadsPassive.OrderBy(i => i.Key.Id)
+        public IReadOnlyDictionary<IActivity, IReadOnlyList<ILoad>> ActivityToLoadsPassive => _activityToLoadsPassive.OrderBy(i => i.Key.Id)
                     .ToDictionary(i => i.Key, i => i.Value).AsReadOnly();
-            }
-        }
         private readonly Dictionary<IActivity, HashSet<ILoad>> _activityToLoadsPassive;
 
-        public IReadOnlyDictionary<IActivity, IReadOnlyList<(IBatch Batch, DateTime Time)>> ActivityToBatchTimesPending
-        {
-            get { return _activityToBatchTimesPending.AsReadOnly(l => l.AsReadOnly(t => ((IBatch)t.Batch, t.Time))); }
-        }
+        public IReadOnlyDictionary<IActivity, IReadOnlyList<(IBatch Batch, DateTime Time)>> ActivityToBatchTimesPending => _activityToBatchTimesPending.AsReadOnly(l => l.AsReadOnly(t => ((IBatch)t.Batch, t.Time)));
         private readonly Dictionary<IActivity, List<(Batch Batch, DateTime Time)>> _activityToBatchTimesPending;
 
-        public IReadOnlyDictionary<IActivity, IReadOnlyList<IBatch>> ActivityToBatchesBatching
-        {
-            get { return _activityToBatchesBatching.AsReadOnly(l => l.AsReadOnly(b => (IBatch)b)); }
-        }
+        public IReadOnlyDictionary<IActivity, IReadOnlyList<IBatch>> ActivityToBatchesBatching => _activityToBatchesBatching.AsReadOnly(l => l.AsReadOnly(b => (IBatch)b));
         private readonly Dictionary<IActivity, List<Batch>> _activityToBatchesBatching;
 
         public IReadOnlyDictionary<IActivity, IReadOnlyList<IResource>> ActivityToResources => _activityToResources.AsReadOnly();
@@ -120,38 +94,17 @@ namespace O2DESNet.RCQueues
         public IReadOnlyDictionary<IResource, IReadOnlyList<IActivity>> ResourceToActivities => _resourceToActivities.AsReadOnly();
         private readonly Dictionary<IResource, HashSet<IActivity>> _resourceToActivities;
 
-        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IBatch, double>> ResourceBatchQuantityActive
-        {
-            get
-            {
-                return _resourceBatchQuantityActive.ToDictionary(i => i.Key, i => i.Value.AsReadOnly()).AsReadOnly();
-            }
-        }
+        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IBatch, double>> ResourceBatchQuantityActive => _resourceBatchQuantityActive.ToDictionary(i => i.Key, i => i.Value.AsReadOnly()).AsReadOnly();
         private readonly Dictionary<IResource, Dictionary<IBatch, double>> _resourceBatchQuantityActive;
 
-        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IBatch, double>> ResourceBatchQuantityPassive
-        {
-            get
-            {
-                return _resourceBatchQuantityPassive.ToDictionary(i => i.Key, i => i.Value.AsReadOnly()).AsReadOnly();
-            }
-        }
+        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IBatch, double>> ResourceBatchQuantityPassive => _resourceBatchQuantityPassive.ToDictionary(i => i.Key, i => i.Value.AsReadOnly()).AsReadOnly();
         private readonly Dictionary<IResource, Dictionary<IBatch, double>> _resourceBatchQuantityPassive;
 
-        public IReadOnlyDictionary<IResource, double> ResourceQuantityOccupied
-        {
-            get { return Assets.Resources.ToReadOnlyDictionary(r => r, r => ResourceHcOccupied[r].LastCount); }
-        }
+        public IReadOnlyDictionary<IResource, double> ResourceQuantityOccupied => Assets.Resources.ToReadOnlyDictionary(r => r, r => ResourceHcOccupied[r].LastCount);
 
-        public IReadOnlyDictionary<IResource, double> ResourceQuantityAvailable
-        {
-            get { return Assets.Resources.ToReadOnlyDictionary(r => r, r => ResourceHcAvailable[r].LastCount); }
-        }
+        public IReadOnlyDictionary<IResource, double> ResourceQuantityAvailable => Assets.Resources.ToReadOnlyDictionary(r => r, r => ResourceHcAvailable[r].LastCount);
 
-        public IReadOnlyDictionary<IResource, double> ResourceQuantityDynamicCapacity
-        {
-            get { return Assets.Resources.ToReadOnlyDictionary(r => r, r => ResourceHcDynamicCapacity[r].LastCount); }
-        }
+        public IReadOnlyDictionary<IResource, double> ResourceQuantityDynamicCapacity => Assets.Resources.ToReadOnlyDictionary(r => r, r => ResourceHcDynamicCapacity[r].LastCount);
 
         public IReadOnlyDictionary<IResource, double> ResourceQuantityPendingLock => _resourceQuantityPendingLock.AsReadOnly();
         private readonly Dictionary<IResource, double> _resourceQuantityPendingLock;
@@ -167,6 +120,7 @@ namespace O2DESNet.RCQueues
         private readonly Dictionary<IActivity, HourCounter> _activityHcPending;
         private readonly Dictionary<IActivity, HourCounter> _activityHcActive;
         private readonly Dictionary<IActivity, HourCounter> _activityHcPassive;
+
         private readonly Dictionary<IResource, HourCounter> _resourceHcPending;
         private readonly Dictionary<IResource, HourCounter> _resourceHcActive;
         private readonly Dictionary<IResource, HourCounter> _resourceHcPassive;
@@ -176,99 +130,52 @@ namespace O2DESNet.RCQueues
         private readonly Dictionary<IResource, HourCounter> _resourceHcPendingLockActive;
         private readonly Dictionary<IResource, HourCounter> _resourceHcPendingLockPassive;
 
+        private readonly Dictionary<IResource, Dictionary<IActivity, HourCounter>> _resourceActivityHcPending;
+        private readonly Dictionary<IResource, Dictionary<IActivity, HourCounter>> _resourceActivityHcActive;
+        private readonly Dictionary<IResource, Dictionary<IActivity, HourCounter>> _resourceActivityHcPassive;
+        private readonly Dictionary<IResource, Dictionary<IActivity, HourCounter>> _resourceActivityHcOccupied;
 
         public IReadOnlyDictionary<IActivity, ReadOnlyHourCounter> ActivityHcPending => _activityHcPending.AsReadOnly(hc => hc.AsReadOnly());
         
         public IReadOnlyDictionary<IActivity, ReadOnlyHourCounter> ActivityHcActive => _activityHcActive.AsReadOnly(hc => hc.AsReadOnly());
         
         public IReadOnlyDictionary<IActivity, ReadOnlyHourCounter> ActivityHcPassive => _activityHcPassive.AsReadOnly(hc => hc.AsReadOnly());
-        
-        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcPending
-        {
-            get { return _resourceHcPending.AsReadOnly(hc => hc.AsReadOnly()); }
-        }
-        
-        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcActive
-        {
-            get { return _resourceHcActive.AsReadOnly(hc => hc.AsReadOnly()); }
-        }
-        
-        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcPassive
-        {
-            get { return _resourceHcPassive.AsReadOnly(hc => hc.AsReadOnly()); }
-        }
-        
-        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcOccupied
-        {
-            get { return _resourceHcOccupied.AsReadOnly(hc => hc.AsReadOnly()); }
-        }
-        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcAvailable
-        {
-            get { return _resourceHcAvailable.AsReadOnly(hc => hc.AsReadOnly()); }
-        }
 
-        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcDynamicCapacity
-        {
-            get { return _resourceHcDynamicCapacity.AsReadOnly(hc => hc.AsReadOnly()); }
-        }
-        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcPendingLockActive
-        {
-            get { return _resourceHcPendingLockActive.AsReadOnly(hc => hc.AsReadOnly()); }
-        }
+        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcPending => _resourceHcPending.AsReadOnly(hc => hc.AsReadOnly());
 
-        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcPendingLockPassive
-        {
-            get { return _resourceHcPendingLockPassive.AsReadOnly(hc => hc.AsReadOnly()); }
-        }
+        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcActive => _resourceHcActive.AsReadOnly(hc => hc.AsReadOnly());
 
-        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHcPending
-        {
-            get
-            {
-                return _resourceToActivities.OrderBy(i => i.Key.Id)
+        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcPassive => _resourceHcPassive.AsReadOnly(hc => hc.AsReadOnly());
+
+        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcOccupied => _resourceHcOccupied.AsReadOnly(hc => hc.AsReadOnly());
+
+        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcAvailable => _resourceHcAvailable.AsReadOnly(hc => hc.AsReadOnly());
+
+        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcDynamicCapacity => _resourceHcDynamicCapacity.AsReadOnly(hc => hc.AsReadOnly());
+
+        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcPendingLockActive => _resourceHcPendingLockActive.AsReadOnly(hc => hc.AsReadOnly());
+
+        public IReadOnlyDictionary<IResource, ReadOnlyHourCounter> ResourceHcPendingLockPassive => _resourceHcPendingLockPassive.AsReadOnly(hc => hc.AsReadOnly());
+
+        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHcPending => _resourceToActivities.OrderBy(i => i.Key.Id)
                     .ToDictionary(i => i.Key, i => i.Value.OrderBy(j => j.Name)
                     .ToDictionary(act => act, act => _resourceActivityHcPending[i.Key][act]))
                     .AsReadOnly(d => d.AsReadOnly(hc => hc.AsReadOnly()));
-            }
-        }
 
-        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHcActive
-        {
-            get
-            {
-                return _resourceToActivities.OrderBy(i => i.Key.Id)
+        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHcActive => _resourceToActivities.OrderBy(i => i.Key.Id)
                     .ToDictionary(i => i.Key, i => i.Value.OrderBy(j => j.Name)
                     .ToDictionary(act => act, act => _resourceActivityHcActive[i.Key][act]))
                     .AsReadOnly(d => d.AsReadOnly(hc => hc.AsReadOnly()));
-            }
-        }
 
-        private readonly Dictionary<IResource, Dictionary<IActivity, HourCounter>> _resourceActivityHcPending;
-        private readonly Dictionary<IResource, Dictionary<IActivity, HourCounter>> _resourceActivityHcActive;
-        private readonly Dictionary<IResource, Dictionary<IActivity, HourCounter>> _resourceActivityHcPassive;
-        private readonly Dictionary<IResource, Dictionary<IActivity, HourCounter>> _resourceActivityHcOccupied;
-
-        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHcPassive
-        {
-            get
-            {
-                return _resourceToActivities.OrderBy(i => i.Key.Id)
+        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHcPassive => _resourceToActivities.OrderBy(i => i.Key.Id)
                     .ToDictionary(i => i.Key, i => i.Value.OrderBy(j => j.Name)
                     .ToDictionary(act => act, act => _resourceActivityHcPassive[i.Key][act]))
                     .AsReadOnly(d => d.AsReadOnly(hc => hc.AsReadOnly()));
-            }
-        }
 
-        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHcOccupied
-        {
-            get
-            {
-                return _resourceToActivities.OrderBy(i => i.Key.Id)
+        public IReadOnlyDictionary<IResource, IReadOnlyDictionary<IActivity, ReadOnlyHourCounter>> ResourceActivityHcOccupied => _resourceToActivities.OrderBy(i => i.Key.Id)
                     .ToDictionary(i => i.Key, i => i.Value.OrderBy(j => j.Name)
                     .ToDictionary(act => act, act => _resourceActivityHcOccupied[i.Key][act]))
                     .AsReadOnly(d => d.AsReadOnly(hc => hc.AsReadOnly()));
-            }
-        }
 
         #endregion
         #endregion
@@ -820,6 +727,7 @@ namespace O2DESNet.RCQueues
             _activityHcActive = new Dictionary<IActivity, HourCounter>();
             _activityHcPassive = new Dictionary<IActivity, HourCounter>();
             _activityHcPending = new Dictionary<IActivity, HourCounter>();
+
             _resourceHcActive = Assets.Resources.ToDictionary(r => r, r => AddHourCounter());
             _resourceHcAvailable = Assets.Resources.ToDictionary(r => r, r =>
             {
@@ -864,31 +772,37 @@ namespace O2DESNet.RCQueues
 
         public string Snapshot()
         {
-            string str = "[Loads]\n";
+            var sb = new StringBuilder();
+            sb.AppendLine("[Loads]");
             foreach (var load in _allLoads.OrderBy(l => l.Index))
             {
-                str +=
-                    $"Id: {load}\tAct_Id: {(_loadToBatchCurrent[load] == null ? Guid.Empty : _loadToBatchCurrent[load].Activity.Id)}\t";
+                sb.Append($"Id: {load}\tAct_Id: {(_loadToBatchCurrent[load] == null ?  Guid.Empty : _loadToBatchCurrent[load].Activity.Id)}\t");
                 if (_loadToBatchCurrent[load] != null && _batchToAllocation.ContainsKey(_loadToBatchCurrent[load]))
-                    foreach (ResourceQuantity item in _batchToAllocation[_loadToBatchCurrent[load]].RequirementResourceQuantityList.SelectMany(i => i.Value))
-                        str += $"Res#{item.Resource.Id}({item.Quantity}) ";
-                str += "\n";
+                {
+                    var resourceQuantities = _batchToAllocation[_loadToBatchCurrent[load]].RequirementResourceQuantityList.SelectMany(i => i.Value);
+                    foreach (ResourceQuantity item in resourceQuantities)
+                        sb.Append($"Res#{item.Resource.Id}({item.Quantity}) ");
+                }
+                sb.AppendLine();
             }
 
-            str += "[Resources]\n";
+            sb.AppendLine("[Resources]");
             foreach (var res in Assets.Resources)
             {
-                str += $"Id: {res.Id}\tOccupied: ";
-                foreach (var current in _loadToBatchCurrent.Values.Distinct().Where(curr => curr != null &&
-                    _batchToAllocation[curr].ResourceQuantityAggregated.ContainsKey(res) && _batchToAllocation[curr].ResourceQuantityAggregated[res] > 0))
-                    str += $"{current} ";
-                str += string.Format("\tPending:");
-                foreach (var toMove in _resourceToActivities[res].SelectMany(a => _activityToBatchTimesPending[a].Select(i => i.Batch)))
-                    str += $"{toMove} ";
-                str += "\n";
+                IEnumerable<Batch> batches;
+
+                batches = _loadToBatchCurrent.Values.Distinct().Where(curr => curr != null &&
+                    _batchToAllocation[curr].ResourceQuantityAggregated.ContainsKey(res) && _batchToAllocation[curr].ResourceQuantityAggregated[res] > 0);
+
+                sb.Append($"Id: {res.Id}\tOccupied: ");
+                foreach (var current in batches) sb.Append($"{current} ");
+                sb.Append("\tPending:");
+                batches = _resourceToActivities[res].SelectMany(a => _activityToBatchTimesPending[a].Select(i => i.Batch));
+                foreach (var toMove in batches) sb.Append($"{toMove} ");
+                sb.AppendLine();
             }
 
-            return str;
+            return sb.ToString();
         }
 
         protected override void WarmedUpHandler()
