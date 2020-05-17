@@ -834,6 +834,7 @@ namespace O2DESNet.RCQueues
         public override void Dispose()
         {
             Dispose(true);
+            base.Dispose();
         }
 
         protected virtual void Dispose(bool disposing)
