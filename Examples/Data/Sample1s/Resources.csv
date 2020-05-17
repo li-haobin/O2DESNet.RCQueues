@@ -1,6 +1,0 @@
-Id,Capacity,Description,
-Beds_CC_AC,20,Beds in the observation area for CC and AC patients
-Beds_IC,10,Beds in the observation area for IC patients
-Docs_CC,5,Doctors for CC patients
-Docs_AC,5,Doctors for AC patients
-Docs_IC,5,Doctors for IC patients
