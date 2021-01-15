@@ -14,3 +14,5 @@
 /ConsoleTester/obj
 /O2DESNet.RCQueues.UnitTest/bin/Debug/netcoreapp2.2
 /O2DESNet.RCQueues.UnitTest/bin/Debug/netcoreapp3.1
+/O2DESNet.RCQueues/bin/Release
+/O2DESNet.RCQueues.UnitTest/bin/Release/netcoreapp3.1
