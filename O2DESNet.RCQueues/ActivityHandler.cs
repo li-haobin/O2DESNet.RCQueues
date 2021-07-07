@@ -39,6 +39,7 @@ namespace O2DESNet.RCQueues
             public List<Requirement> RequirementList { get; set; } = new List<Requirement>();
             public BatchSizeRange BatchSizeRange { get; } = new BatchSizeRange(1, 1);
             public Func<TLoad, Random, TimeSpan> Duration { get; set; } = (load, rs) => TimeSpan.Zero;
+            public Func<(IBatch Batch, DateTime Time), (IBatch Batch, DateTime Time), int> BatchOrder { get; set; } = (t1, t2) => t1.Time.CompareTo(t2.Time);
         }
 
         public Statics Config { get; protected set; }

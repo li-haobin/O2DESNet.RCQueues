@@ -621,7 +621,9 @@ namespace O2DESNet.RCQueues
                     if (moveTo.Count(l => _loadToBatch_Current[l] != null && _loadToBatch_Current[l].Activity == moveTo.Activity) > 0)
                         clockTime = DateTime.MinValue; /// consider the case of immediate re-work having highest priority, to avoid deadlock
                     _activityToBatchTimes_Pending[moveTo.Activity].Add((moveTo, clockTime));
-                    _activityToBatchTimes_Pending[moveTo.Activity].Sort((t1, t2) => t1.Time.CompareTo(t2.Time));
+                    // Provide customerized batch sorting
+                    //_activityToBatchTimes_Pending[moveTo.Activity].Sort((t1, t2) => t1.Time.CompareTo(t2.Time));
+                    _activityToBatchTimes_Pending[moveTo.Activity].Sort((t1, t2) => moveTo.Activity.BatchOrder(t1, t2));
 
                     foreach (var res in _activityToResources[moveTo.Activity])
                     {

@@ -13,6 +13,7 @@ namespace O2DESNet.RCQueues
         /// Inclusive minimum and maxsimum of the batch size
         /// </summary>
         BatchSizeRange BatchSizeRange { get; }
+        Func<(IBatch Batch, DateTime Time), (IBatch Batch, DateTime Time), int> BatchOrder { get; set; }
     }
 
     /// <summary>
@@ -26,5 +27,6 @@ namespace O2DESNet.RCQueues
         public BatchSizeRange BatchSizeRange { get; set; } = new BatchSizeRange();
         public Func<Random, IEnumerable<ILoad>, IAllocation, TimeSpan> Duration { get; set; }
         public Func<Random, ILoad, IActivity> Succeedings { get; set; }
+        public Func<(IBatch Batch, DateTime Time), (IBatch Batch, DateTime Time), int> BatchOrder { get; set; } = (t1, t2) => t1.Time.CompareTo(t2.Time);
     }
 }
