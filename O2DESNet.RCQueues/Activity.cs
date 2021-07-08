@@ -13,6 +13,12 @@ namespace O2DESNet.RCQueues
         /// Inclusive minimum and maxsimum of the batch size
         /// </summary>
         BatchSizeRange BatchSizeRange { get; }
+        /// <summary>
+        /// Provide batch ordering for resource allocation
+        /// First parameter is first batch 
+        /// Second parameter is next batch
+        /// Result, -1 means first parameter is processed first, 1 means first parameter last
+        /// </summary>
         Func<(IBatch Batch, DateTime Time), (IBatch Batch, DateTime Time), int> BatchOrder { get; set; }
     }
 
