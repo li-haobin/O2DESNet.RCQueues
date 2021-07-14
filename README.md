@@ -5,6 +5,12 @@ An O²DES.NET library for modeling flexible queueing system with consideration o
 The NuGet package can be found at https://www.nuget.org/packages/O2DESNet.RCQueues/.
 
 # Change Log
+## Version 3.9 
+- Provide BatchOrder function property to set up resource assignment priority function by batch and request time
+
+## Version 3.8
+- Provide Activity Handler by Load type
+- Provide RCQContext base class for simulation modeling 
 
 ## Version 3.7
 - Enable query for Active/Passive batches by Resource
