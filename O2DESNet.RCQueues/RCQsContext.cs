@@ -58,7 +58,15 @@ namespace O2DESNet.RCQueues
                     res => _rcqModel.ResourceHC_Available[res].AverageCount);
             }
         }
-
+        protected Dictionary<ILoad, ReadOnlyAllocation> LoadToAllocation
+        {
+            get
+            {
+                return _rcqModel.LoadToBatch_Current
+                    .Join(_rcqModel.BatchToAllocation, p => p.Value, q => q.Key, (p, q) => new { p.Key, q.Value })
+                    .ToDictionary(p => p.Key, p => p.Value);
+            }
+        }
         protected IActivityHandler AddChild(IActivityHandler activityHandler)
         {
             AddChild(activityHandler as Sandbox);
