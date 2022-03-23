@@ -5,6 +5,9 @@ An O²DES.NET library for modeling flexible queueing system with consideration o
 The NuGet package can be found at https://www.nuget.org/packages/O2DESNet.RCQueues/.
 
 # Change Log
+## Version 3.11
+- Implement activity condition in RCQ model
+
 ## Version 3.10
 - Provide load to resource allocation mapping in RCQsContext
 
