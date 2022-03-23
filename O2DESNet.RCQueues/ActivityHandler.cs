@@ -25,6 +25,7 @@ namespace O2DESNet.RCQueues
         event Action<TLoad> OnReadyToDepart;
         IActivityHandler<TLoad> FlowTo(IActivityHandler<TLoad> nextActivityHandler);
         void FlowTo(Action<TLoad> targetEvent);
+        bool IsActivityFit(TLoad load);
     }
 
     public class ActivityHandler<TLoad> : Sandbox, IActivityHandler<TLoad>
@@ -40,6 +41,7 @@ namespace O2DESNet.RCQueues
             public BatchSizeRange BatchSizeRange { get; } = new BatchSizeRange(1, 1);
             public Func<TLoad, Random, TimeSpan> Duration { get; set; } = (load, rs) => TimeSpan.Zero;
             public Func<(IBatch Batch, DateTime Time), (IBatch Batch, DateTime Time), int> BatchOrder { get; set; } = (t1, t2) => t1.Time.CompareTo(t2.Time);
+            public Dictionary<string, object> Conditions { get; set; } = new Dictionary<string, object>();
         }
 
         public Statics Config { get; protected set; }
@@ -62,8 +64,44 @@ namespace O2DESNet.RCQueues
         /// <param name="load">The load flow through the activity</param>
         public virtual void RequestToArrive(TLoad load)
         {
-            PendingLoads.Add(load);
-            OnRequestToStart.Invoke(load);
+            if (IsActivityFit(load))
+            {
+                PendingLoads.Add(load);
+                OnRequestToStart.Invoke(load);
+            }
+        }
+
+        /// <summary>
+        /// Check whether that load is fit into that activity
+        /// </summary>
+        /// <param name="load">The load flow through the activity</param>
+        /// <returns>true if that load can fit into the activity</returns>
+        public bool IsActivityFit(TLoad load)
+        {
+            if (Config.Conditions != null && Config.Conditions.Count > 0)
+            {
+                foreach (var key in Config.Conditions.Keys)
+                {
+                    if (Config.Conditions[key] != null)
+                    {
+                        object loadValue;
+                        try
+                        {
+                            loadValue = load.GetType().GetProperty(key).GetValue(load);
+                        }
+                        catch
+                        {
+                            loadValue = null;
+                        }
+
+                        if (loadValue == null || !Config.Conditions[key].Equals(loadValue))
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
         }
 
         /// <summary>
