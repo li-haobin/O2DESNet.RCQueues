@@ -7,6 +7,7 @@ The NuGet package can be found at https://www.nuget.org/packages/O2DESNet.RCQueu
 # Change Log
 ## Version 3.11
 - Implement activity condition in RCQ model
+- Implement load attribute update through FlowTo function implementation. Activity handler flow set up must be the latest.
 
 ## Version 3.10
 - Provide load to resource allocation mapping in RCQsContext
